@@ -204,6 +204,30 @@ function updateTopStories(articles) {
                 if (time) time.textContent = article.time;
             }
         });
+    } else {
+        // Show "No articles found" message
+        const headline = featuredStory.querySelector('.story-headline');
+        const summary = featuredStory.querySelector('.story-summary');
+        const readMore = featuredStory.querySelector('.read-more');
+        
+        if (headline) headline.textContent = 'No articles found';
+        if (summary) summary.textContent = 'Unable to load top stories at this time.';
+        if (readMore) {
+            readMore.href = '#';
+            readMore.textContent = 'Try again later';
+        }
+        
+        // Clear story list
+        const storyItems = storyList.querySelectorAll('.story-item');
+        storyItems.forEach(item => {
+            const title = item.querySelector('.story-title');
+            const excerpt = item.querySelector('.story-excerpt');
+            const time = item.querySelector('.story-time');
+            
+            if (title) title.textContent = 'No articles available';
+            if (excerpt) excerpt.textContent = '';
+            if (time) time.textContent = '';
+        });
     }
 }
 

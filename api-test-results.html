@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Results - Daily News Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .api-result {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .query-info {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 API Test Results - Daily News Platform</h1>
+    
+    <div class="test-section">
+        <h2>🧪 Test All Search Queries</h2>
+        <button onclick="testAllQueries()">Test All Search Queries</button>
+        <button onclick="testOpinionQuery()">Test Opinion Query</button>
+        <button onclick="testArtsQuery()">Test Arts Query</button>
+        <button onclick="testFashionQuery()">Test Fashion Query</button>
+        <button onclick="testEventsQuery()">Test Events Query</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="test-results" class="test-results">
+            <div class="status info">Click the test buttons above to see detailed API results...</div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        let newsAPI;
+        
+        // Initialize NewsAPI
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                newsAPI = new NewsAPI();
+                console.log('NewsAPI initialized successfully');
+            } catch (error) {
+                console.error('Error initializing NewsAPI:', error);
+            }
+        });
+
+        async function testAllQueries() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing all search queries...</div>';
+            
+            let html = '<h3>All Search Query Results:</h3>';
+            
+            // Test Opinion
+            html += await testQuery('Opinion', 'opinion OR editorial OR commentary');
+            
+            // Test Arts
+            html += await testQuery('Arts & Culture', 'arts OR culture OR entertainment OR music OR theater');
+            
+            // Test Fashion
+            html += await testQuery('Fashion & Trends', 'fashion OR style OR trends OR beauty');
+            
+            // Test Events
+            html += await testQuery('NY Events', 'New York events OR NYC events OR Manhattan events');
+            
+            results.innerHTML = html;
+        }
+
+        async function testOpinionQuery() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing Opinion query...</div>';
+            
+            const html = await testQuery('Opinion', 'opinion OR editorial OR commentary');
+            results.innerHTML = html;
+        }
+
+        async function testArtsQuery() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing Arts query...</div>';
+            
+            const html = await testQuery('Arts & Culture', 'arts OR culture OR entertainment OR music OR theater');
+            results.innerHTML = html;
+        }
+
+        async function testFashionQuery() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing Fashion query...</div>';
+            
+            const html = await testQuery('Fashion & Trends', 'fashion OR style OR trends OR beauty');
+            results.innerHTML = html;
+        }
+
+        async function testEventsQuery() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing Events query...</div>';
+            
+            const html = await testQuery('NY Events', 'New York events OR NYC events OR Manhattan events');
+            results.innerHTML = html;
+        }
+
+        async function testQuery(sectionName, query) {
+            let html = `<div class="api-result"><h3>${sectionName}</h3>`;
+            html += `<div class="query-info"><strong>Search Query:</strong> "${query}"</div>`;
+            
+            try {
+                // Test Guardian API
+                html += '<h4>Guardian API Results:</h4>';
+                try {
+                    const guardianResult = await newsAPI.fetchFromGuardian('/search', { 
+                        'show-fields': 'headline,trailText,thumbnail', 
+                        q: query 
+                    });
+                    
+                    if (guardianResult && guardianResult.response && guardianResult.response.results) {
+                        html += `<div class="status success">✓ Guardian API: ${guardianResult.response.results.length} results</div>`;
+                        html += '<pre>' + JSON.stringify(guardianResult.response.results.slice(0, 3), null, 2) + '</pre>';
+                    } else {
+                        html += '<div class="status warning">⚠ Guardian API: No results or unexpected format</div>';
+                        html += '<pre>' + JSON.stringify(guardianResult, null, 2) + '</pre>';
+                    }
+                } catch (error) {
+                    html += `<div class="status error">✗ Guardian API Error: ${error.message}</div>`;
+                }
+                
+                // Test NY Times API
+                html += '<h4>NY Times API Results:</h4>';
+                try {
+                    const nytResult = await newsAPI.fetchFromNYTimes('/search/v2/articlesearch.json', { 
+                        q: query 
+                    });
+                    
+                    if (nytResult && nytResult.response && nytResult.response.docs) {
+                        html += `<div class="status success">✓ NY Times API: ${nytResult.response.docs.length} results</div>`;
+                        html += '<pre>' + JSON.stringify(nytResult.response.docs.slice(0, 3), null, 2) + '</pre>';
+                    } else {
+                        html += '<div class="status warning">⚠ NY Times API: No results or unexpected format</div>';
+                        html += '<pre>' + JSON.stringify(nytResult, null, 2) + '</pre>';
+                    }
+                } catch (error) {
+                    html += `<div class="status error">✗ NY Times API Error: ${error.message}</div>`;
+                }
+                
+                // Test NewsAPI
+                html += '<h4>NewsAPI Results:</h4>';
+                try {
+                    const newsapiResult = await newsAPI.fetchFromNewsAPI('/everything', { 
+                        q: query,
+                        sortBy: 'publishedAt',
+                        pageSize: 10
+                    });
+                    
+                    if (newsapiResult && newsapiResult.articles) {
+                        html += `<div class="status success">✓ NewsAPI: ${newsapiResult.articles.length} results</div>`;
+                        html += '<pre>' + JSON.stringify(newsapiResult.articles.slice(0, 3), null, 2) + '</pre>';
+                    } else {
+                        html += '<div class="status warning">⚠ NewsAPI: No results or unexpected format</div>';
+                        html += '<pre>' + JSON.stringify(newsapiResult, null, 2) + '</pre>';
+                    }
+                } catch (error) {
+                    html += `<div class="status error">✗ NewsAPI Error: ${error.message}</div>`;
+                }
+                
+            } catch (error) {
+                html += `<div class="status error">✗ General Error: ${error.message}</div>`;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+    </script>
+</body>
+</html>

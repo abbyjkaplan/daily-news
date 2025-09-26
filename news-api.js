@@ -302,8 +302,8 @@ class NewsAPI {
             console.log('Fetching fresh opinion articles...');
             
             const sources = [
-                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'opinion' }),
-                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'opinion' })
+                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'news' }),
+                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'news' })
             ];
             
             const results = await Promise.allSettled(sources.map(source => source()));
@@ -350,8 +350,8 @@ class NewsAPI {
             console.log('Fetching fresh arts & culture...');
             
             const sources = [
-                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'arts' }),
-                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'arts' })
+                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'news' }),
+                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'news' })
             ];
             
             const results = await Promise.allSettled(sources.map(source => source()));
@@ -398,8 +398,8 @@ class NewsAPI {
             console.log('Fetching fresh fashion & trends...');
             
             const sources = [
-                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'fashion' }),
-                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'fashion' })
+                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'news' }),
+                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'news' })
             ];
             
             const results = await Promise.allSettled(sources.map(source => source()));
@@ -446,8 +446,8 @@ class NewsAPI {
             console.log('Fetching fresh NY events...');
             
             const sources = [
-                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'New York' }),
-                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'New York' })
+                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'news' }),
+                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'news' })
             ];
             
             const results = await Promise.allSettled(sources.map(source => source()));

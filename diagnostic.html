@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic - Identify API Issues</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #d1ecf1; color: #0c5460; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error-details {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Diagnostic - Identify API Issues</h1>
+    <p>This page will help identify exactly what API errors you're experiencing.</p>
+    
+    <div class="test-section">
+        <h2>Browser Environment Check</h2>
+        <div id="browser-check">
+            <button onclick="checkBrowserEnvironment()">Check Browser Environment</button>
+        </div>
+        <div id="browser-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Network Connectivity Test</h2>
+        <div id="network-test">
+            <button onclick="testNetworkConnectivity()">Test Network Connectivity</button>
+        </div>
+        <div id="network-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>CORS and Security Test</h2>
+        <div id="cors-test">
+            <button onclick="testCORSIssues()">Test CORS Issues</button>
+        </div>
+        <div id="cors-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>API Key Validation</h2>
+        <div id="api-key-test">
+            <button onclick="validateAPIKeys()">Validate API Keys</button>
+        </div>
+        <div id="api-key-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Error Capture</h2>
+        <div id="error-capture">
+            <p>This section will capture and display any errors that occur during testing.</p>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced error capture
+        const errorCapture = document.getElementById('error-capture');
+        
+        function captureError(type, error, context = '') {
+            const timestamp = new Date().toLocaleTimeString();
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-details';
+            errorDiv.innerHTML = `
+                <strong>[${timestamp}] ${type.toUpperCase()}:</strong> ${error.message || error}<br>
+                <strong>Context:</strong> ${context}<br>
+                <strong>Stack:</strong> <pre style="font-size: 10px; margin: 5px 0;">${error.stack || 'No stack trace'}</pre>
+            `;
+            errorCapture.appendChild(errorDiv);
+        }
+        
+        // Override console methods to capture errors
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            captureError('CONSOLE ERROR', args.join(' '), 'Console Error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            captureError('CONSOLE WARNING', args.join(' '), 'Console Warning');
+        };
+        
+        // Capture unhandled errors
+        window.addEventListener('error', function(event) {
+            captureError('UNHANDLED ERROR', event.error, `File: ${event.filename}, Line: ${event.lineno}`);
+        });
+        
+        window.addEventListener('unhandledrejection', function(event) {
+            captureError('UNHANDLED PROMISE REJECTION', event.reason, 'Promise Rejection');
+        });
+    </script>
+    
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        let newsAPI = null;
+        
+        function checkBrowserEnvironment() {
+            const resultsDiv = document.getElementById('browser-results');
+            const results = [];
+            
+            try {
+                // Check browser info
+                results.push(`User Agent: ${navigator.userAgent}`);
+                results.push(`Platform: ${navigator.platform}`);
+                results.push(`Language: ${navigator.language}`);
+                results.push(`Online: ${navigator.onLine}`);
+                results.push(`Cookies Enabled: ${navigator.cookieEnabled}`);
+                
+                // Check JavaScript features
+                results.push(`Fetch API: ${typeof fetch !== 'undefined' ? 'Available' : 'Not Available'}`);
+                results.push(`Promise: ${typeof Promise !== 'undefined' ? 'Available' : 'Not Available'}`);
+                results.push(`Async/Await: ${typeof (async () => {}) !== 'undefined' ? 'Available' : 'Not Available'}`);
+                
+                // Check localStorage
+                try {
+                    localStorage.setItem('test', 'test');
+                    localStorage.removeItem('test');
+                    results.push('LocalStorage: Available');
+                } catch (error) {
+                    results.push(`LocalStorage: Not Available (${error.message})`);
+                }
+                
+                // Check CONFIG
+                if (typeof CONFIG !== 'undefined') {
+                    results.push('CONFIG: Loaded');
+                    results.push(`API Keys: ${Object.keys(CONFIG.apiKeys || {}).length} configured`);
+                } else {
+                    results.push('CONFIG: Not Loaded');
+                }
+                
+                // Check NewsAPI class
+                if (typeof NewsAPI !== 'undefined') {
+                    results.push('NewsAPI Class: Available');
+                } else {
+                    results.push('NewsAPI Class: Not Available');
+                }
+                
+                resultsDiv.innerHTML = `
+                    <div class="status success">✓ Browser environment check completed</div>
+                    <pre>${results.join('\n')}</pre>
+                `;
+                
+            } catch (error) {
+                captureError('BROWSER CHECK ERROR', error, 'Browser Environment Check');
+                resultsDiv.innerHTML = `<div class="status error">✗ Browser check failed: ${error.message}</div>`;
+            }
+        }
+        
+        async function testNetworkConnectivity() {
+            const resultsDiv = document.getElementById('network-results');
+            resultsDiv.innerHTML = '<div class="status loading">Testing network connectivity...</div>';
+            
+            const results = [];
+            
+            try {
+                // Test basic connectivity
+                const testUrls = [
+                    'https://httpbin.org/get',
+                    'https://api.github.com',
+                    'https://jsonplaceholder.typicode.com/posts/1'
+                ];
+                
+                for (const url of testUrls) {
+                    try {
+                        const response = await fetch(url, { method: 'HEAD' });
+                        results.push(`✓ ${url}: ${response.status}`);
+                    } catch (error) {
+                        results.push(`✗ ${url}: ${error.message}`);
+                    }
+                }
+                
+                // Test news APIs specifically
+                const newsUrls = [
+                    'https://newsapi.org/v2/top-headlines?country=us&apiKey=6ce6ad8f6dc149748aa5d88eaa26632e',
+                    'https://content.guardianapis.com/search?api-key=4ee83d60-f3c2-432f-bccd-edda4bad2bbe',
+                    'https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=ryJNFYRNEe5nntlRnMCNJLnC1CQE6Juh&q=test'
+                ];
+                
+                for (const url of newsUrls) {
+                    try {
+                        const response = await fetch(url);
+                        results.push(`✓ News API ${url.split('/')[2]}: ${response.status}`);
+                    } catch (error) {
+                        results.push(`✗ News API ${url.split('/')[2]}: ${error.message}`);
+                    }
+                }
+                
+                const successCount = results.filter(r => r.startsWith('✓')).length;
+                const totalCount = results.length;
+                
+                resultsDiv.innerHTML = `
+                    <div class="status ${successCount === totalCount ? 'success' : 'error'}">
+                        ${successCount === totalCount ? '✓' : '⚠'} Network test completed (${successCount}/${totalCount})
+                    </div>
+                    <pre>${results.join('\n')}</pre>
+                `;
+                
+            } catch (error) {
+                captureError('NETWORK TEST ERROR', error, 'Network Connectivity Test');
+                resultsDiv.innerHTML = `<div class="status error">✗ Network test failed: ${error.message}</div>`;
+            }
+        }
+        
+        async function testCORSIssues() {
+            const resultsDiv = document.getElementById('cors-results');
+            resultsDiv.innerHTML = '<div class="status loading">Testing CORS issues...</div>';
+            
+            const results = [];
+            
+            try {
+                // Test CORS with different methods
+                const corsTests = [
+                    {
+                        name: 'NewsAPI GET',
+                        url: 'https://newsapi.org/v2/top-headlines?country=us&apiKey=6ce6ad8f6dc149748aa5d88eaa26632e',
+                        method: 'GET'
+                    },
+                    {
+                        name: 'Guardian API GET',
+                        url: 'https://content.guardianapis.com/search?api-key=4ee83d60-f3c2-432f-bccd-edda4bad2bbe',
+                        method: 'GET'
+                    },
+                    {
+                        name: 'NY Times API GET',
+                        url: 'https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=ryJNFYRNEe5nntlRnMCNJLnC1CQE6Juh&q=test',
+                        method: 'GET'
+                    }
+                ];
+                
+                for (const test of corsTests) {
+                    try {
+                        const response = await fetch(test.url, {
+                            method: test.method,
+                            mode: 'cors',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            results.push(`✓ ${test.name}: CORS OK (${response.status})`);
+                        } else {
+                            results.push(`⚠ ${test.name}: CORS OK but HTTP ${response.status}`);
+                        }
+                    } catch (error) {
+                        if (error.message.includes('CORS') || error.message.includes('cross-origin')) {
+                            results.push(`✗ ${test.name}: CORS Error - ${error.message}`);
+                        } else {
+                            results.push(`✗ ${test.name}: ${error.message}`);
+                        }
+                    }
+                }
+                
+                const successCount = results.filter(r => r.startsWith('✓')).length;
+                const totalCount = results.length;
+                
+                resultsDiv.innerHTML = `
+                    <div class="status ${successCount === totalCount ? 'success' : 'error'}">
+                        ${successCount === totalCount ? '✓' : '⚠'} CORS test completed (${successCount}/${totalCount})
+                    </div>
+                    <pre>${results.join('\n')}</pre>
+                `;
+                
+            } catch (error) {
+                captureError('CORS TEST ERROR', error, 'CORS Issues Test');
+                resultsDiv.innerHTML = `<div class="status error">✗ CORS test failed: ${error.message}</div>`;
+            }
+        }
+        
+        function validateAPIKeys() {
+            const resultsDiv = document.getElementById('api-key-results');
+            const results = [];
+            
+            try {
+                if (typeof CONFIG === 'undefined') {
+                    results.push('✗ CONFIG not loaded');
+                } else {
+                    const apiKeys = CONFIG.apiKeys || {};
+                    
+                    // Check NewsAPI key
+                    if (apiKeys.newsapi && apiKeys.newsapi !== 'your-newsapi-key-here') {
+                        results.push(`✓ NewsAPI key: ${apiKeys.newsapi.substring(0, 8)}...`);
+                    } else {
+                        results.push('✗ NewsAPI key: Not configured or invalid');
+                    }
+                    
+                    // Check Guardian key
+                    if (apiKeys.guardian && apiKeys.guardian !== 'your-guardian-key-here') {
+                        results.push(`✓ Guardian key: ${apiKeys.guardian.substring(0, 8)}...`);
+                    } else {
+                        results.push('✗ Guardian key: Not configured or invalid');
+                    }
+                    
+                    // Check NY Times key
+                    if (apiKeys.nytimes && apiKeys.nytimes !== 'your-nytimes-key-here') {
+                        results.push(`✓ NY Times key: ${apiKeys.nytimes.substring(0, 8)}...`);
+                    } else {
+                        results.push('✗ NY Times key: Not configured or invalid');
+                    }
+                }
+                
+                const successCount = results.filter(r => r.startsWith('✓')).length;
+                const totalCount = results.length;
+                
+                resultsDiv.innerHTML = `
+                    <div class="status ${successCount === totalCount ? 'success' : 'error'}">
+                        ${successCount === totalCount ? '✓' : '⚠'} API key validation completed (${successCount}/${totalCount})
+                    </div>
+                    <pre>${results.join('\n')}</pre>
+                `;
+                
+            } catch (error) {
+                captureError('API KEY VALIDATION ERROR', error, 'API Key Validation');
+                resultsDiv.innerHTML = `<div class="status error">✗ API key validation failed: ${error.message}</div>`;
+            }
+        }
+        
+        // Auto-run diagnostics on page load
+        window.addEventListener('load', () => {
+            console.log('=== DIAGNOSTIC PAGE LOADED ===');
+            setTimeout(() => {
+                checkBrowserEnvironment();
+                validateAPIKeys();
+                testNetworkConnectivity();
+                testCORSIssues();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

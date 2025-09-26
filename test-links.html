@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Test - Daily News Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .article {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .read-more {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .read-more:hover {
+            color: #666;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Link Test - Daily News Platform</h1>
+    <p>This page tests if the news API is returning proper URLs and if the links are clickable.</p>
+    
+    <div class="test-section">
+        <h2>Test NewsAPI</h2>
+        <div id="newsapi-test">
+            <div class="article">
+                <h3>Loading...</h3>
+                <p>Fetching news from NewsAPI...</p>
+                <a href="#" class="read-more">Read More →</a>
+            </div>
+        </div>
+        <button onclick="testNewsAPI()">Test NewsAPI</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Guardian API</h2>
+        <div id="guardian-test">
+            <div class="article">
+                <h3>Loading...</h3>
+                <p>Fetching news from Guardian...</p>
+                <a href="#" class="read-more">Read More →</a>
+            </div>
+        </div>
+        <button onclick="testGuardian()">Test Guardian</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test NY Times API</h2>
+        <div id="nytimes-test">
+            <div class="article">
+                <h3>Loading...</h3>
+                <p>Fetching news from NY Times...</p>
+                <a href="#" class="read-more">Read More →</a>
+            </div>
+        </div>
+        <button onclick="testNYTimes()">Test NY Times</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Debug Information</h2>
+        <div id="debug-info">
+            <p>Check the browser console (F12) for detailed logs.</p>
+            <p>Click the "Read More" links above to test if they work.</p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        async function testNewsAPI() {
+            const testDiv = document.getElementById('newsapi-test');
+            testDiv.innerHTML = '<div class="article"><h3>Loading...</h3><p>Fetching from NewsAPI...</p></div>';
+            
+            try {
+                const response = await fetch(`https://newsapi.org/v2/top-headlines?country=us&pageSize=3&apiKey=${CONFIG.apiKeys.newsapi}`);
+                const data = await response.json();
+                
+                if (response.ok && data.articles) {
+                    let html = '';
+                    data.articles.forEach(article => {
+                        html += `
+                            <div class="article">
+                                <h3>${article.title}</h3>
+                                <p>${article.description || 'No description available'}</p>
+                                <p><strong>Source:</strong> ${article.source.name}</p>
+                                <p><strong>URL:</strong> <a href="${article.url}" target="_blank">${article.url}</a></p>
+                                <a href="${article.url}" class="read-more" target="_blank" rel="noopener noreferrer">Read More →</a>
+                            </div>
+                        `;
+                    });
+                    testDiv.innerHTML = html;
+                } else {
+                    testDiv.innerHTML = `<div class="article"><h3>Error</h3><p>Failed to fetch from NewsAPI: ${response.status}</p></div>`;
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<div class="article"><h3>Error</h3><p>Network error: ${error.message}</p></div>`;
+            }
+        }
+        
+        async function testGuardian() {
+            const testDiv = document.getElementById('guardian-test');
+            testDiv.innerHTML = '<div class="article"><h3>Loading...</h3><p>Fetching from Guardian...</p></div>';
+            
+            try {
+                const response = await fetch(`https://content.guardianapis.com/search?api-key=${CONFIG.apiKeys.guardian}`);
+                const data = await response.json();
+                
+                if (response.ok && data.response && data.response.results) {
+                    let html = '';
+                    data.response.results.slice(0, 3).forEach(article => {
+                        html += `
+                            <div class="article">
+                                <h3>${article.webTitle}</h3>
+                                <p>${article.fields?.trailText || 'No description available'}</p>
+                                <p><strong>Source:</strong> The Guardian</p>
+                                <p><strong>URL:</strong> <a href="${article.webUrl}" target="_blank">${article.webUrl}</a></p>
+                                <a href="${article.webUrl}" class="read-more" target="_blank" rel="noopener noreferrer">Read More →</a>
+                            </div>
+                        `;
+                    });
+                    testDiv.innerHTML = html;
+                } else {
+                    testDiv.innerHTML = `<div class="article"><h3>Error</h3><p>Failed to fetch from Guardian: ${response.status}</p></div>`;
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<div class="article"><h3>Error</h3><p>Network error: ${error.message}</p></div>`;
+            }
+        }
+        
+        async function testNYTimes() {
+            const testDiv = document.getElementById('nytimes-test');
+            testDiv.innerHTML = '<div class="article"><h3>Loading...</h3><p>Fetching from NY Times...</p></div>';
+            
+            try {
+                const response = await fetch(`https://api.nytimes.com/svc/mostpopular/v2/viewed/1.json?api-key=${CONFIG.apiKeys.nytimes}`);
+                const data = await response.json();
+                
+                if (response.ok && data.results) {
+                    let html = '';
+                    data.results.slice(0, 3).forEach(article => {
+                        html += `
+                            <div class="article">
+                                <h3>${article.title}</h3>
+                                <p>${article.abstract || 'No description available'}</p>
+                                <p><strong>Source:</strong> The New York Times</p>
+                                <p><strong>URL:</strong> <a href="${article.url}" target="_blank">${article.url}</a></p>
+                                <a href="${article.url}" class="read-more" target="_blank" rel="noopener noreferrer">Read More →</a>
+                            </div>
+                        `;
+                    });
+                    testDiv.innerHTML = html;
+                } else {
+                    testDiv.innerHTML = `<div class="article"><h3>Error</h3><p>Failed to fetch from NY Times: ${response.status}</p></div>`;
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<div class="article"><h3>Error</h3><p>Network error: ${error.message}</p></div>`;
+            }
+        }
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            testNewsAPI();
+            testGuardian();
+            testNYTimes();
+        });
+    </script>
+</body>
+</html>

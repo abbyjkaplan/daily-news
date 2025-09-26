@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NY Times API Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .endpoint {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>NY Times API Debug - Find Working Endpoints</h1>
+    <p>This page tests different NY Times API endpoints to find which ones your key has access to.</p>
+    
+    <div class="test-section">
+        <h2>API Key Information</h2>
+        <div id="key-info">
+            <p><strong>Your API Key:</strong> <code id="api-key-display"></code></p>
+            <p><strong>Note:</strong> NY Times has different APIs (Article Search, Most Popular, Top Stories, etc.) and your key might only work with specific ones.</p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Endpoint Tests</h2>
+        <div id="endpoint-tests">
+            <div class="status loading">Testing different NY Times API endpoints...</div>
+        </div>
+        <button onclick="testAllEndpoints()">Test All Endpoints</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Working Endpoints</h2>
+        <div id="working-endpoints">
+            <p>Click "Test All Endpoints" to see which endpoints work with your API key.</p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Raw Responses</h2>
+        <div id="raw-responses">
+            <p>Detailed API responses will appear here.</p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const API_KEY = CONFIG.apiKeys.nytimes;
+        const BASE_URL = 'https://api.nytimes.com/svc';
+        
+        // Display API key (partially hidden)
+        document.getElementById('api-key-display').textContent = API_KEY.substring(0, 8) + '...' + API_KEY.substring(API_KEY.length - 4);
+        
+        const endpoints = [
+            // Top Stories API
+            { name: 'Top Stories - Home', url: '/topstories/v2/home.json', description: 'Home page top stories' },
+            { name: 'Top Stories - World', url: '/topstories/v2/world.json', description: 'World news top stories' },
+            { name: 'Top Stories - Politics', url: '/topstories/v2/politics.json', description: 'Politics top stories' },
+            { name: 'Top Stories - Arts', url: '/topstories/v2/arts.json', description: 'Arts top stories' },
+            { name: 'Top Stories - Opinion', url: '/topstories/v2/opinion.json', description: 'Opinion top stories' },
+            
+            // Most Popular API
+            { name: 'Most Popular - Viewed', url: '/mostpopular/v2/viewed/1.json', description: 'Most viewed articles' },
+            { name: 'Most Popular - Emailed', url: '/mostpopular/v2/emailed/1.json', description: 'Most emailed articles' },
+            { name: 'Most Popular - Shared', url: '/mostpopular/v2/shared/1.json', description: 'Most shared articles' },
+            
+            // Article Search API
+            { name: 'Article Search', url: '/search/v2/articlesearch.json?q=news', description: 'Search for articles' },
+            
+            // Archive API
+            { name: 'Archive - Current Month', url: '/archive/v1/2024/09.json', description: 'Archive for current month' },
+            
+            // Books API
+            { name: 'Books - Best Sellers', url: '/books/v3/lists/current/hardcover-fiction.json', description: 'Best selling books' },
+            
+            // Movies API
+            { name: 'Movies - Reviews', url: '/movies/v2/reviews/search.json?query=inception', description: 'Movie reviews' },
+            
+            // Semantic API
+            { name: 'Semantic - Concepts', url: '/semantic/v2/concept/search.json?query=obama', description: 'Semantic concepts' }
+        ];
+        
+        async function testAllEndpoints() {
+            const testDiv = document.getElementById('endpoint-tests');
+            const workingDiv = document.getElementById('working-endpoints');
+            const rawDiv = document.getElementById('raw-responses');
+            
+            testDiv.innerHTML = '<div class="status loading">Testing all endpoints...</div>';
+            workingDiv.innerHTML = '';
+            rawDiv.innerHTML = '';
+            
+            const results = [];
+            const working = [];
+            const rawResponses = [];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const fullUrl = `${BASE_URL}${endpoint.url}${endpoint.url.includes('?') ? '&' : '?'}api-key=${API_KEY}`;
+                    const response = await fetch(fullUrl);
+                    const data = await response.json();
+                    
+                    if (response.ok && data && !data.fault) {
+                        results.push(`<div class="endpoint"><strong>✓ ${endpoint.name}</strong><br>${endpoint.description}</div>`);
+                        working.push(endpoint);
+                        rawResponses.push(`<h4>${endpoint.name}</h4><pre>${JSON.stringify(data, null, 2)}</pre>`);
+                    } else {
+                        const errorMsg = data.fault ? data.fault.faultstring : `HTTP ${response.status}`;
+                        results.push(`<div class="endpoint"><strong>✗ ${endpoint.name}</strong><br>Error: ${errorMsg}</div>`);
+                    }
+                } catch (error) {
+                    results.push(`<div class="endpoint"><strong>✗ ${endpoint.name}</strong><br>Network Error: ${error.message}</div>`);
+                }
+            }
+            
+            testDiv.innerHTML = results.join('');
+            
+            if (working.length > 0) {
+                workingDiv.innerHTML = `
+                    <div class="status success">Found ${working.length} working endpoints!</div>
+                    <h3>Available Endpoints:</h3>
+                    ${working.map(ep => `<div class="endpoint"><strong>${ep.name}</strong><br>${ep.description}<br><code>${ep.url}</code></div>`).join('')}
+                `;
+            } else {
+                workingDiv.innerHTML = '<div class="status error">No working endpoints found. Your API key might be invalid or expired.</div>';
+            }
+            
+            rawDiv.innerHTML = rawResponses.join('');
+        }
+        
+        // Auto-run test on page load
+        window.addEventListener('load', () => {
+            testAllEndpoints();
+        });
+    </script>
+</body>
+</html>

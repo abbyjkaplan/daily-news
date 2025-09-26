@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #d1ecf1; color: #0c5460; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .article {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Complete Debug Test</h1>
+    <p>This page performs a comprehensive debug of the entire platform to identify all issues.</p>
+    
+    <div class="test-section">
+        <h2>Script Loading Debug</h2>
+        <div id="script-debug" class="status loading">Checking script loading...</div>
+        <button onclick="debugScripts()">Debug Scripts</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>NewsAPI Debug</h2>
+        <div id="newsapi-debug" class="status loading">Checking NewsAPI...</div>
+        <button onclick="debugNewsAPI()">Debug NewsAPI</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>API Configuration Debug</h2>
+        <div id="config-debug" class="status loading">Checking API configuration...</div>
+        <button onclick="debugConfig()">Debug Config</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>API Calls Debug</h2>
+        <div id="api-calls-debug" class="status loading">Testing API calls...</div>
+        <button onclick="debugAPICalls()">Debug API Calls</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Sample Data</h2>
+        <div id="sample-data"></div>
+        <button onclick="loadSampleData()">Load Sample Data</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console-output">
+            <p>Open browser console (F12) to see detailed logs.</p>
+        </div>
+    </div>
+
+    <script>
+        // Capture console output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const consoleOutput = document.getElementById('console-output');
+        
+        function addToConsoleOutput(type, ...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>[${timestamp}] ${type.toUpperCase()}:</strong> ${message}`;
+            div.style.marginBottom = '5px';
+            div.style.fontSize = '12px';
+            div.style.fontFamily = 'monospace';
+            div.style.backgroundColor = type === 'error' ? '#f8d7da' : type === 'warn' ? '#fff3cd' : '#d1ecf1';
+            div.style.padding = '5px';
+            div.style.borderRadius = '3px';
+            
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsoleOutput('log', ...args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsoleOutput('error', ...args);
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsoleOutput('warn', ...args);
+        };
+    </script>
+    
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        let newsAPI = null;
+        
+        function debugScripts() {
+            const debugDiv = document.getElementById('script-debug');
+            const results = [];
+            
+            console.log('=== SCRIPT LOADING DEBUG ===');
+            
+            // Check CONFIG
+            if (typeof CONFIG !== 'undefined') {
+                results.push('✓ CONFIG loaded');
+                console.log('CONFIG object:', CONFIG);
+            } else {
+                results.push('✗ CONFIG not loaded');
+                console.error('CONFIG is undefined');
+            }
+            
+            // Check NewsAPI class
+            if (typeof NewsAPI !== 'undefined') {
+                results.push('✓ NewsAPI class loaded');
+                console.log('NewsAPI class:', NewsAPI);
+            } else {
+                results.push('✗ NewsAPI class not loaded');
+                console.error('NewsAPI class is undefined');
+            }
+            
+            // Check window objects
+            const windowObjects = ['CONFIG', 'NewsAPI'];
+            windowObjects.forEach(obj => {
+                if (window[obj]) {
+                    results.push(`✓ window.${obj} available`);
+                } else {
+                    results.push(`✗ window.${obj} not available`);
+                }
+            });
+            
+            const successCount = results.filter(r => r.startsWith('✓')).length;
+            const totalCount = results.length;
+            
+            if (successCount === totalCount) {
+                debugDiv.textContent = `✓ All scripts loaded (${successCount}/${totalCount})`;
+                debugDiv.className = 'status success';
+            } else {
+                debugDiv.textContent = `⚠ Script issues (${successCount}/${totalCount})`;
+                debugDiv.className = 'status error';
+            }
+            
+            console.log('Script debug results:', results);
+        }
+        
+        function debugNewsAPI() {
+            const debugDiv = document.getElementById('newsapi-debug');
+            const results = [];
+            
+            console.log('=== NEWSAPI DEBUG ===');
+            
+            try {
+                newsAPI = new NewsAPI();
+                results.push('✓ NewsAPI instance created');
+                console.log('NewsAPI instance:', newsAPI);
+                
+                // Check methods
+                const methods = [
+                    'clearCache',
+                    'fetchTopStories',
+                    'fetchNYNews',
+                    'fetchUSNews',
+                    'fetchGlobalNews',
+                    'fetchOpinion',
+                    'fetchArtsCulture',
+                    'fetchFashionTrends',
+                    'fetchNYEvents'
+                ];
+                
+                const availableMethods = methods.filter(method => typeof newsAPI[method] === 'function');
+                const missingMethods = methods.filter(method => typeof newsAPI[method] !== 'function');
+                
+                if (availableMethods.length === methods.length) {
+                    results.push('✓ All methods available');
+                } else {
+                    results.push(`⚠ Missing methods: ${missingMethods.join(', ')}`);
+                }
+                
+                console.log('Available methods:', availableMethods);
+                console.log('Missing methods:', missingMethods);
+                
+            } catch (error) {
+                results.push(`✗ NewsAPI creation failed: ${error.message}`);
+                console.error('NewsAPI creation error:', error);
+            }
+            
+            const successCount = results.filter(r => r.startsWith('✓')).length;
+            const totalCount = results.length;
+            
+            if (successCount === totalCount) {
+                debugDiv.textContent = `✓ NewsAPI working (${successCount}/${totalCount})`;
+                debugDiv.className = 'status success';
+            } else {
+                debugDiv.textContent = `⚠ NewsAPI issues (${successCount}/${totalCount})`;
+                debugDiv.className = 'status error';
+            }
+            
+            console.log('NewsAPI debug results:', results);
+        }
+        
+        function debugConfig() {
+            const debugDiv = document.getElementById('config-debug');
+            const results = [];
+            
+            console.log('=== CONFIG DEBUG ===');
+            
+            if (typeof CONFIG !== 'undefined') {
+                results.push('✓ CONFIG object exists');
+                
+                // Check API keys
+                if (CONFIG.apiKeys) {
+                    results.push('✓ API keys object exists');
+                    
+                    const apiKeys = CONFIG.apiKeys;
+                    Object.keys(apiKeys).forEach(key => {
+                        if (apiKeys[key] && apiKeys[key] !== `your-${key}-key-here`) {
+                            results.push(`✓ ${key} API key configured`);
+                        } else {
+                            results.push(`✗ ${key} API key not configured`);
+                        }
+                    });
+                } else {
+                    results.push('✗ API keys object missing');
+                }
+                
+                console.log('CONFIG details:', CONFIG);
+            } else {
+                results.push('✗ CONFIG not available');
+            }
+            
+            const successCount = results.filter(r => r.startsWith('✓')).length;
+            const totalCount = results.length;
+            
+            if (successCount === totalCount) {
+                debugDiv.textContent = `✓ Config looks good (${successCount}/${totalCount})`;
+                debugDiv.className = 'status success';
+            } else {
+                debugDiv.textContent = `⚠ Config issues (${successCount}/${totalCount})`;
+                debugDiv.className = 'status error';
+            }
+            
+            console.log('Config debug results:', results);
+        }
+        
+        async function debugAPICalls() {
+            const debugDiv = document.getElementById('api-calls-debug');
+            const results = [];
+            
+            console.log('=== API CALLS DEBUG ===');
+            
+            if (!newsAPI) {
+                try {
+                    newsAPI = new NewsAPI();
+                } catch (error) {
+                    debugDiv.textContent = `✗ Cannot create NewsAPI: ${error.message}`;
+                    debugDiv.className = 'status error';
+                    return;
+                }
+            }
+            
+            try {
+                // Test clearCache
+                newsAPI.clearCache();
+                results.push('✓ clearCache works');
+                console.log('Cache cleared successfully');
+                
+                // Test fetchTopStories
+                console.log('Testing fetchTopStories...');
+                const topStories = await newsAPI.fetchTopStories();
+                
+                if (topStories && topStories.length > 0) {
+                    results.push(`✓ fetchTopStories works (${topStories.length} articles)`);
+                    console.log('Top stories result:', topStories);
+                } else {
+                    results.push('⚠ fetchTopStories returned empty');
+                    console.warn('No top stories returned');
+                }
+                
+                // Test other methods
+                const methods = ['fetchNYNews', 'fetchUSNews', 'fetchGlobalNews'];
+                for (const method of methods) {
+                    try {
+                        console.log(`Testing ${method}...`);
+                        const result = await newsAPI[method]();
+                        if (result && result.length > 0) {
+                            results.push(`✓ ${method} works (${result.length} articles)`);
+                        } else {
+                            results.push(`⚠ ${method} returned empty`);
+                        }
+                    } catch (error) {
+                        results.push(`✗ ${method} failed: ${error.message}`);
+                        console.error(`${method} error:`, error);
+                    }
+                }
+                
+            } catch (error) {
+                results.push(`✗ API calls failed: ${error.message}`);
+                console.error('API calls error:', error);
+            }
+            
+            const successCount = results.filter(r => r.startsWith('✓')).length;
+            const totalCount = results.length;
+            
+            if (successCount === totalCount) {
+                debugDiv.textContent = `✓ API calls working (${successCount}/${totalCount})`;
+                debugDiv.className = 'status success';
+            } else {
+                debugDiv.textContent = `⚠ API call issues (${successCount}/${totalCount})`;
+                debugDiv.className = 'status error';
+            }
+            
+            console.log('API calls debug results:', results);
+        }
+        
+        async function loadSampleData() {
+            const sampleDiv = document.getElementById('sample-data');
+            
+            if (!newsAPI) {
+                try {
+                    newsAPI = new NewsAPI();
+                } catch (error) {
+                    sampleDiv.innerHTML = `<p>Error: Cannot create NewsAPI: ${error.message}</p>`;
+                    return;
+                }
+            }
+            
+            try {
+                console.log('Loading sample data...');
+                newsAPI.clearCache();
+                
+                const articles = await newsAPI.fetchTopStories();
+                
+                if (articles && articles.length > 0) {
+                    let html = '<h3>Sample Articles:</h3>';
+                    articles.slice(0, 3).forEach((article, index) => {
+                        html += `
+                            <div class="article">
+                                <h4>${index + 1}. ${article.headline}</h4>
+                                <p>${article.summary}</p>
+                                <p><strong>Source:</strong> ${article.source}</p>
+                                <p><strong>Time:</strong> ${article.time}</p>
+                                <p><strong>URL:</strong> <a href="${article.url}" target="_blank" rel="noopener noreferrer">Read Full Article →</a></p>
+                            </div>
+                        `;
+                    });
+                    sampleDiv.innerHTML = html;
+                    console.log('Sample data loaded successfully');
+                } else {
+                    sampleDiv.innerHTML = '<p>No articles returned. Check console for errors.</p>';
+                    console.warn('No articles returned');
+                }
+            } catch (error) {
+                sampleDiv.innerHTML = `<p>Error loading sample data: ${error.message}</p>`;
+                console.error('Sample data error:', error);
+            }
+        }
+        
+        // Auto-run debug on page load
+        window.addEventListener('load', () => {
+            console.log('=== DEBUG PAGE LOADED ===');
+            setTimeout(() => {
+                debugScripts();
+                debugNewsAPI();
+                debugConfig();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

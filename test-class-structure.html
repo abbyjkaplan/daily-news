@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Class Structure</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #d1ecf1; color: #0c5460; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Class Structure</h1>
+    <p>This page tests the NewsAPI class structure to identify why clearCache is not available.</p>
+    
+    <div class="test-section">
+        <h2>Class Definition Test</h2>
+        <div id="class-test">
+            <button onclick="testClassDefinition()">Test Class Definition</button>
+        </div>
+        <div id="class-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Method Availability Test</h2>
+        <div id="method-test">
+            <button onclick="testMethodAvailability()">Test Method Availability</button>
+        </div>
+        <div id="method-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Instance Creation Test</h2>
+        <div id="instance-test">
+            <button onclick="testInstanceCreation()">Test Instance Creation</button>
+        </div>
+        <div id="instance-results"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        function testClassDefinition() {
+            const resultsDiv = document.getElementById('class-results');
+            const results = [];
+            
+            try {
+                // Check if NewsAPI class exists
+                if (typeof NewsAPI !== 'undefined') {
+                    results.push('✓ NewsAPI class is defined');
+                    
+                    // Check if it's a function/class
+                    if (typeof NewsAPI === 'function') {
+                        results.push('✓ NewsAPI is a function/class');
+                    } else {
+                        results.push('✗ NewsAPI is not a function/class');
+                    }
+                    
+                    // Check prototype
+                    if (NewsAPI.prototype) {
+                        results.push('✓ NewsAPI has prototype');
+                        
+                        // List all methods on prototype
+                        const methods = Object.getOwnPropertyNames(NewsAPI.prototype);
+                        results.push(`✓ NewsAPI prototype has ${methods.length} methods:`);
+                        methods.forEach(method => {
+                            results.push(`  - ${method}: ${typeof NewsAPI.prototype[method]}`);
+                        });
+                    } else {
+                        results.push('✗ NewsAPI has no prototype');
+                    }
+                    
+                } else {
+                    results.push('✗ NewsAPI class is not defined');
+                }
+                
+                resultsDiv.innerHTML = `
+                    <div class="status success">✓ Class definition test completed</div>
+                    <pre>${results.join('\n')}</pre>
+                `;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">✗ Class definition test failed: ${error.message}</div>`;
+                console.error('Class definition test error:', error);
+            }
+        }
+        
+        function testMethodAvailability() {
+            const resultsDiv = document.getElementById('method-results');
+            const results = [];
+            
+            try {
+                if (typeof NewsAPI === 'undefined') {
+                    results.push('✗ NewsAPI class not available');
+                } else {
+                    // Check specific methods
+                    const methodsToCheck = [
+                        'clearCache',
+                        'forceRefresh',
+                        'fetchTopStories',
+                        'fetchNYNews',
+                        'fetchUSNews',
+                        'fetchGlobalNews',
+                        'fetchOpinion',
+                        'fetchArtsCulture',
+                        'fetchFashionTrends',
+                        'fetchNYEvents'
+                    ];
+                    
+                    methodsToCheck.forEach(method => {
+                        if (typeof NewsAPI.prototype[method] === 'function') {
+                            results.push(`✓ ${method}: Available`);
+                        } else {
+                            results.push(`✗ ${method}: Not available (${typeof NewsAPI.prototype[method]})`);
+                        }
+                    });
+                }
+                
+                const successCount = results.filter(r => r.startsWith('✓')).length;
+                const totalCount = results.length;
+                
+                resultsDiv.innerHTML = `
+                    <div class="status ${successCount === totalCount ? 'success' : 'error'}">
+                        ${successCount === totalCount ? '✓' : '⚠'} Method availability test completed (${successCount}/${totalCount})
+                    </div>
+                    <pre>${results.join('\n')}</pre>
+                `;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">✗ Method availability test failed: ${error.message}</div>`;
+                console.error('Method availability test error:', error);
+            }
+        }
+        
+        function testInstanceCreation() {
+            const resultsDiv = document.getElementById('instance-results');
+            const results = [];
+            
+            try {
+                if (typeof NewsAPI === 'undefined') {
+                    results.push('✗ NewsAPI class not available');
+                } else {
+                    // Try to create instance
+                    const instance = new NewsAPI();
+                    results.push('✓ NewsAPI instance created successfully');
+                    
+                    // Check instance methods
+                    const methodsToCheck = [
+                        'clearCache',
+                        'forceRefresh',
+                        'fetchTopStories'
+                    ];
+                    
+                    methodsToCheck.forEach(method => {
+                        if (typeof instance[method] === 'function') {
+                            results.push(`✓ Instance.${method}: Available`);
+                        } else {
+                            results.push(`✗ Instance.${method}: Not available (${typeof instance[method]})`);
+                        }
+                    });
+                    
+                    // Try to call clearCache
+                    try {
+                        instance.clearCache();
+                        results.push('✓ clearCache() call successful');
+                    } catch (error) {
+                        results.push(`✗ clearCache() call failed: ${error.message}`);
+                    }
+                }
+                
+                const successCount = results.filter(r => r.startsWith('✓')).length;
+                const totalCount = results.length;
+                
+                resultsDiv.innerHTML = `
+                    <div class="status ${successCount === totalCount ? 'success' : 'error'}">
+                        ${successCount === totalCount ? '✓' : '⚠'} Instance creation test completed (${successCount}/${totalCount})
+                    </div>
+                    <pre>${results.join('\n')}</pre>
+                `;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">✗ Instance creation test failed: ${error.message}</div>`;
+                console.error('Instance creation test error:', error);
+            }
+        }
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            console.log('=== CLASS STRUCTURE TEST PAGE LOADED ===');
+            setTimeout(() => {
+                testClassDefinition();
+                testMethodAvailability();
+                testInstanceCreation();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

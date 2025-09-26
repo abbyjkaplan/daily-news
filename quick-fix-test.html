@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Quick Fix Test</h1>
+    <p>This page tests if the clearCache method is now available.</p>
+    
+    <div class="test-section">
+        <h2>ClearCache Method Test</h2>
+        <div id="test-results">
+            <button onclick="testClearCache()">Test ClearCache Method</button>
+        </div>
+        <div id="results"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        function testClearCache() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                // Check if NewsAPI class exists
+                if (typeof NewsAPI === 'undefined') {
+                    resultsDiv.innerHTML = '<div class="status error">✗ NewsAPI class not available</div>';
+                    return;
+                }
+                
+                // Create instance
+                const newsAPI = new NewsAPI();
+                
+                // Check if clearCache method exists
+                if (typeof newsAPI.clearCache === 'function') {
+                    // Try to call it
+                    newsAPI.clearCache();
+                    resultsDiv.innerHTML = '<div class="status success">✓ clearCache method is available and working!</div>';
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">✗ clearCache method is not available</div>';
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">✗ Error: ${error.message}</div>`;
+                console.error('Test error:', error);
+            }
+        }
+        
+        // Auto-run test on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testClearCache();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

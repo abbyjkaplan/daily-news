@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsAPI Test - Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>NewsAPI Debug Test</h1>
+    <p>This page tests the NewsAPI class and all its methods to ensure they work correctly.</p>
+    
+    <div class="test-section">
+        <h2>Class Initialization Test</h2>
+        <div id="init-status" class="status loading">Testing NewsAPI initialization...</div>
+        <button onclick="testInitialization()">Test Initialization</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Method Availability Test</h2>
+        <div id="methods-status" class="status loading">Testing method availability...</div>
+        <button onclick="testMethods()">Test Methods</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Force Refresh Test</h2>
+        <div id="refresh-status" class="status loading">Testing forceRefresh method...</div>
+        <button onclick="testForceRefresh()">Test Force Refresh</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Clear Cache Test</h2>
+        <div id="cache-status" class="status loading">Testing clearCache method...</div>
+        <button onclick="testClearCache()">Test Clear Cache</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Full Integration Test</h2>
+        <div id="integration-status" class="status loading">Testing full integration...</div>
+        <button onclick="testIntegration()">Test Full Integration</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Debug Output</h2>
+        <div id="debug-output">
+            <p>Check the browser console (F12) for detailed logs.</p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        let newsAPI = null;
+        
+        function testInitialization() {
+            const statusDiv = document.getElementById('init-status');
+            
+            try {
+                newsAPI = new NewsAPI();
+                statusDiv.textContent = '✓ NewsAPI initialized successfully';
+                statusDiv.className = 'status success';
+                console.log('NewsAPI instance:', newsAPI);
+            } catch (error) {
+                statusDiv.textContent = `✗ Initialization failed: ${error.message}`;
+                statusDiv.className = 'status error';
+                console.error('Initialization error:', error);
+            }
+        }
+        
+        function testMethods() {
+            const statusDiv = document.getElementById('methods-status');
+            
+            if (!newsAPI) {
+                statusDiv.textContent = '✗ NewsAPI not initialized';
+                statusDiv.className = 'status error';
+                return;
+            }
+            
+            const methods = [
+                'fetchTopStories',
+                'fetchNYNews',
+                'fetchUSNews',
+                'fetchGlobalNews',
+                'fetchOpinion',
+                'fetchArtsCulture',
+                'fetchFashionTrends',
+                'fetchNYEvents',
+                'forceRefresh',
+                'clearCache'
+            ];
+            
+            const missingMethods = methods.filter(method => typeof newsAPI[method] !== 'function');
+            
+            if (missingMethods.length === 0) {
+                statusDiv.textContent = '✓ All methods available';
+                statusDiv.className = 'status success';
+            } else {
+                statusDiv.textContent = `✗ Missing methods: ${missingMethods.join(', ')}`;
+                statusDiv.className = 'status error';
+            }
+            
+            console.log('Available methods:', methods.filter(method => typeof newsAPI[method] === 'function'));
+            console.log('Missing methods:', missingMethods);
+        }
+        
+        async function testForceRefresh() {
+            const statusDiv = document.getElementById('refresh-status');
+            
+            if (!newsAPI) {
+                statusDiv.textContent = '✗ NewsAPI not initialized';
+                statusDiv.className = 'status error';
+                return;
+            }
+            
+            try {
+                statusDiv.textContent = 'Testing forceRefresh...';
+                statusDiv.className = 'status loading';
+                
+                const results = await newsAPI.forceRefresh();
+                statusDiv.textContent = '✓ forceRefresh completed successfully';
+                statusDiv.className = 'status success';
+                console.log('Force refresh results:', results);
+            } catch (error) {
+                statusDiv.textContent = `✗ forceRefresh failed: ${error.message}`;
+                statusDiv.className = 'status error';
+                console.error('Force refresh error:', error);
+            }
+        }
+        
+        function testClearCache() {
+            const statusDiv = document.getElementById('cache-status');
+            
+            if (!newsAPI) {
+                statusDiv.textContent = '✗ NewsAPI not initialized';
+                statusDiv.className = 'status error';
+                return;
+            }
+            
+            try {
+                newsAPI.clearCache();
+                statusDiv.textContent = '✓ clearCache completed successfully';
+                statusDiv.className = 'status success';
+                console.log('Cache cleared');
+            } catch (error) {
+                statusDiv.textContent = `✗ clearCache failed: ${error.message}`;
+                statusDiv.className = 'status error';
+                console.error('Clear cache error:', error);
+            }
+        }
+        
+        async function testIntegration() {
+            const statusDiv = document.getElementById('integration-status');
+            
+            if (!newsAPI) {
+                statusDiv.textContent = '✗ NewsAPI not initialized';
+                statusDiv.className = 'status error';
+                return;
+            }
+            
+            try {
+                statusDiv.textContent = 'Testing full integration...';
+                statusDiv.className = 'status loading';
+                
+                // Test clear cache
+                newsAPI.clearCache();
+                console.log('Cache cleared');
+                
+                // Test fetching top stories
+                const topStories = await newsAPI.fetchTopStories();
+                console.log('Top stories result:', topStories);
+                
+                statusDiv.textContent = '✓ Full integration test completed';
+                statusDiv.className = 'status success';
+            } catch (error) {
+                statusDiv.textContent = `✗ Integration test failed: ${error.message}`;
+                statusDiv.className = 'status error';
+                console.error('Integration error:', error);
+            }
+        }
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testInitialization();
+                testMethods();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

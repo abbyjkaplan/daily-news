@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily News Summary</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <h1>Daily News</h1>
+                <p class="date" id="currentDate"></p>
+            </div>
+            <nav class="nav">
+                <a href="#top-stories">Top Stories</a>
+                <a href="#ny-news">NY News</a>
+                <a href="#us-news">US News</a>
+                <a href="#global-news">Global</a>
+                <a href="#opinion">Opinion</a>
+                <a href="#arts">Arts</a>
+                <a href="#fashion">Fashion</a>
+                <a href="#events">Events</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Top Stories Section -->
+        <section id="top-stories" class="section top-stories">
+            <h2 class="section-title">Top Stories</h2>
+            <div class="stories-grid">
+                <div class="featured-story">
+                    <div class="story-image">
+                        <img src="https://via.placeholder.com/600x400/1a1a1a/ffffff?text=Breaking+News" alt="Featured story">
+                    </div>
+                    <div class="story-content">
+                        <h3 class="story-headline">Major Development in International Relations</h3>
+                        <p class="story-summary">A significant diplomatic breakthrough has been announced following months of negotiations between world leaders.</p>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </div>
+                <div class="story-list">
+                    <div class="story-item">
+                        <h4 class="story-title">Economic Indicators Show Positive Trends</h4>
+                        <p class="story-excerpt">Latest data reveals encouraging signs for the national economy.</p>
+                        <span class="story-time">2 hours ago</span>
+                    </div>
+                    <div class="story-item">
+                        <h4 class="story-title">Technology Sector Sees Major Investment</h4>
+                        <p class="story-excerpt">Several tech companies announce significant funding rounds.</p>
+                        <span class="story-time">4 hours ago</span>
+                    </div>
+                    <div class="story-item">
+                        <h4 class="story-title">Climate Change Conference Updates</h4>
+                        <p class="story-excerpt">New commitments made at international climate summit.</p>
+                        <span class="story-time">6 hours ago</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New York News Section -->
+        <section id="ny-news" class="section ny-news">
+            <h2 class="section-title">New York News</h2>
+            <div class="news-grid">
+                <div class="news-card">
+                    <div class="news-image">
+                        <img src="https://via.placeholder.com/300x200/2c2c2c/ffffff?text=NYC+Politics" alt="NY Politics">
+                    </div>
+                    <div class="news-content">
+                        <h3 class="news-headline">City Council Approves New Housing Initiative</h3>
+                        <p class="news-summary">The New York City Council has unanimously approved a comprehensive housing plan aimed at addressing the city's affordability crisis.</p>
+                        <div class="news-meta">
+                            <span class="news-source">NYC Council</span>
+                            <span class="news-time">3 hours ago</span>
+                        </div>
+                        <a href="#" class="read-more">Read Full Article →</a>
+                    </div>
+                </div>
+                <div class="news-card">
+                    <div class="news-image">
+                        <img src="https://via.placeholder.com/300x200/2c2c2c/ffffff?text=Transportation" alt="Transportation">
+                    </div>
+                    <div class="news-content">
+                        <h3 class="news-headline">MTA Announces Subway Service Improvements</h3>
+                        <p class="news-summary">Major upgrades to subway infrastructure promise faster, more reliable service across all boroughs.</p>
+                        <div class="news-meta">
+                            <span class="news-source">MTA</span>
+                            <span class="news-time">5 hours ago</span>
+                        </div>
+                        <a href="#" class="read-more">Read Full Article →</a>
+                    </div>
+                </div>
+                <div class="news-card">
+                    <div class="news-image">
+                        <img src="https://via.placeholder.com/300x200/2c2c2c/ffffff?text=Business" alt="Business">
+                    </div>
+                    <div class="news-content">
+                        <h3 class="news-headline">Wall Street Sees Record Trading Volume</h3>
+                        <p class="news-summary">Financial markets experience unprecedented activity as investors respond to economic indicators.</p>
+                        <div class="news-meta">
+                            <span class="news-source">Financial Times</span>
+                            <span class="news-time">1 hour ago</span>
+                        </div>
+                        <a href="#" class="read-more">Read Full Article →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- US News Section -->
+        <section id="us-news" class="section us-news">
+            <h2 class="section-title">US News</h2>
+            <div class="news-layout">
+                <div class="main-story">
+                    <div class="story-image">
+                        <img src="https://via.placeholder.com/500x300/1a1a1a/ffffff?text=US+Politics" alt="US Politics">
+                    </div>
+                    <div class="story-content">
+                        <h3 class="story-headline">Congressional Session Addresses Key Legislation</h3>
+                        <p class="story-summary">Lawmakers debate critical bills affecting healthcare, infrastructure, and environmental policy in a marathon session.</p>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </div>
+                <div class="sidebar-stories">
+                    <div class="sidebar-story">
+                        <h4 class="story-title">Supreme Court Hears Major Case</h4>
+                        <p class="story-excerpt">Constitutional implications of recent legislation under review.</p>
+                        <span class="story-time">2 hours ago</span>
+                    </div>
+                    <div class="sidebar-story">
+                        <h4 class="story-title">Federal Reserve Announces Policy Changes</h4>
+                        <p class="story-excerpt">Interest rate adjustments expected to impact markets nationwide.</p>
+                        <span class="story-time">4 hours ago</span>
+                    </div>
+                    <div class="sidebar-story">
+                        <h4 class="story-title">National Security Briefing Released</h4>
+                        <p class="story-excerpt">Intelligence agencies provide updates on current threats.</p>
+                        <span class="story-time">6 hours ago</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Global News Section -->
+        <section id="global-news" class="section global-news">
+            <h2 class="section-title">Global News</h2>
+            <div class="global-grid">
+                <div class="global-card">
+                    <div class="card-header">
+                        <span class="region">Europe</span>
+                        <span class="time">3 hours ago</span>
+                    </div>
+                    <h3 class="card-headline">EU Summit Addresses Energy Crisis</h3>
+                    <p class="card-summary">European leaders convene to discuss coordinated response to energy challenges.</p>
+                    <a href="#" class="read-more">Read More →</a>
+                </div>
+                <div class="global-card">
+                    <div class="card-header">
+                        <span class="region">Asia</span>
+                        <span class="time">5 hours ago</span>
+                    </div>
+                    <h3 class="card-headline">Trade Agreement Reached in Pacific</h3>
+                    <p class="card-summary">Major trade deal signed between Pacific nations, expected to boost regional economy.</p>
+                    <a href="#" class="read-more">Read More →</a>
+                </div>
+                <div class="global-card">
+                    <div class="card-header">
+                        <span class="region">Africa</span>
+                        <span class="time">7 hours ago</span>
+                    </div>
+                    <h3 class="card-headline">Climate Initiative Launched</h3>
+                    <p class="card-summary">African nations announce ambitious renewable energy partnership.</p>
+                    <a href="#" class="read-more">Read More →</a>
+                </div>
+                <div class="global-card">
+                    <div class="card-header">
+                        <span class="region">Americas</span>
+                        <span class="time">1 hour ago</span>
+                    </div>
+                    <h3 class="card-headline">Regional Summit Concludes</h3>
+                    <p class="card-summary">Leaders from North and South America announce new cooperation framework.</p>
+                    <a href="#" class="read-more">Read More →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Opinion Section -->
+        <section id="opinion" class="section opinion">
+            <h2 class="section-title">Opinion & Analysis</h2>
+            <div class="opinion-grid">
+                <div class="opinion-featured">
+                    <div class="opinion-image">
+                        <img src="https://via.placeholder.com/400x250/2c2c2c/ffffff?text=Opinion" alt="Opinion">
+                    </div>
+                    <div class="opinion-content">
+                        <div class="opinion-meta">
+                            <span class="opinion-author">By Editorial Board</span>
+                            <span class="opinion-time">4 hours ago</span>
+                        </div>
+                        <h3 class="opinion-headline">The Future of Democracy in the Digital Age</h3>
+                        <p class="opinion-summary">As technology continues to reshape our political landscape, we must consider how to preserve democratic values in an increasingly connected world.</p>
+                        <a href="#" class="read-more">Read Full Opinion →</a>
+                    </div>
+                </div>
+                <div class="opinion-list">
+                    <div class="opinion-item">
+                        <h4 class="opinion-title">Economic Policy Needs a Reset</h4>
+                        <p class="opinion-author">By Dr. Sarah Chen</p>
+                        <p class="opinion-excerpt">Current economic approaches may not be sufficient to address modern challenges.</p>
+                        <span class="opinion-time">6 hours ago</span>
+                    </div>
+                    <div class="opinion-item">
+                        <h4 class="opinion-title">Climate Action: Time for Bold Steps</h4>
+                        <p class="opinion-author">By Prof. Michael Rodriguez</p>
+                        <p class="opinion-excerpt">Incremental change is no longer enough to address the climate crisis.</p>
+                        <span class="opinion-time">8 hours ago</span>
+                    </div>
+                    <div class="opinion-item">
+                        <h4 class="opinion-title">Technology and Society: Finding Balance</h4>
+                        <p class="opinion-author">By Lisa Thompson</p>
+                        <p class="opinion-excerpt">How can we harness technology's benefits while protecting human values?</p>
+                        <span class="opinion-time">10 hours ago</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arts & Culture Section -->
+        <section id="arts" class="section arts">
+            <h2 class="section-title">Arts & Culture</h2>
+            <div class="arts-layout">
+                <div class="arts-featured">
+                    <div class="arts-image">
+                        <img src="https://via.placeholder.com/500x300/2c2c2c/ffffff?text=NYC+Arts" alt="NYC Arts">
+                    </div>
+                    <div class="arts-content">
+                        <div class="arts-meta">
+                            <span class="arts-category">Theater</span>
+                            <span class="arts-time">2 hours ago</span>
+                        </div>
+                        <h3 class="arts-headline">Broadway's New Season Promises Innovation</h3>
+                        <p class="arts-summary">This season's lineup features groundbreaking productions that push the boundaries of traditional theater.</p>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </div>
+                <div class="arts-sidebar">
+                    <div class="arts-item">
+                        <h4 class="arts-title">Metropolitan Museum Opens New Exhibition</h4>
+                        <p class="arts-excerpt">Contemporary art from emerging artists takes center stage.</p>
+                        <span class="arts-time">4 hours ago</span>
+                    </div>
+                    <div class="arts-item">
+                        <h4 class="arts-title">Jazz Festival Returns to Central Park</h4>
+                        <p class="arts-excerpt">Annual celebration of jazz music features world-renowned performers.</p>
+                        <span class="arts-time">6 hours ago</span>
+                    </div>
+                    <div class="arts-item">
+                        <h4 class="arts-title">Literary Festival Highlights Local Authors</h4>
+                        <p class="arts-excerpt">Brooklyn Book Festival showcases diverse voices and stories.</p>
+                        <span class="arts-time">8 hours ago</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fashion & Trends Section -->
+        <section id="fashion" class="section fashion">
+            <h2 class="section-title">Fashion & Trends</h2>
+            <div class="fashion-grid">
+                <div class="fashion-card">
+                    <div class="fashion-image">
+                        <img src="https://via.placeholder.com/300x400/2c2c2c/ffffff?text=Fashion" alt="Fashion">
+                    </div>
+                    <div class="fashion-content">
+                        <h3 class="fashion-headline">Sustainable Fashion Takes Center Stage</h3>
+                        <p class="fashion-summary">Designers embrace eco-friendly materials and ethical production methods.</p>
+                        <div class="fashion-meta">
+                            <span class="fashion-category">Sustainability</span>
+                            <span class="fashion-time">3 hours ago</span>
+                        </div>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </div>
+                <div class="fashion-card">
+                    <div class="fashion-image">
+                        <img src="https://via.placeholder.com/300x400/2c2c2c/ffffff?text=Trends" alt="Trends">
+                    </div>
+                    <div class="fashion-content">
+                        <h3 class="fashion-headline">Street Style Influences High Fashion</h3>
+                        <p class="fashion-summary">Urban aesthetics continue to shape runway collections worldwide.</p>
+                        <div class="fashion-meta">
+                            <span class="fashion-category">Street Style</span>
+                            <span class="fashion-time">5 hours ago</span>
+                        </div>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </div>
+                <div class="fashion-card">
+                    <div class="fashion-image">
+                        <img src="https://via.placeholder.com/300x400/2c2c2c/ffffff?text=Design" alt="Design">
+                    </div>
+                    <div class="fashion-content">
+                        <h3 class="fashion-headline">Tech Meets Fashion in New Collection</h3>
+                        <p class="fashion-summary">Innovative designs incorporate wearable technology seamlessly.</p>
+                        <div class="fashion-meta">
+                            <span class="fashion-category">Technology</span>
+                            <span class="fashion-time">7 hours ago</span>
+                        </div>
+                        <a href="#" class="read-more">Read More →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New York Events Section -->
+        <section id="events" class="section events">
+            <h2 class="section-title">New York Events</h2>
+            <div class="events-layout">
+                <div class="events-featured">
+                    <div class="event-image">
+                        <img src="https://via.placeholder.com/400x250/2c2c2c/ffffff?text=NYC+Events" alt="NYC Events">
+                    </div>
+                    <div class="event-content">
+                        <div class="event-meta">
+                            <span class="event-date">Today</span>
+                            <span class="event-location">Central Park</span>
+                        </div>
+                        <h3 class="event-headline">Summer Concert Series Kicks Off</h3>
+                        <p class="event-summary">Free outdoor concerts featuring local and international artists throughout the summer.</p>
+                        <a href="#" class="read-more">Get Details →</a>
+                    </div>
+                </div>
+                <div class="events-list">
+                    <div class="event-item">
+                        <div class="event-date">
+                            <span class="day">15</span>
+                            <span class="month">JUN</span>
+                        </div>
+                        <div class="event-info">
+                            <h4 class="event-title">Food Festival in Brooklyn</h4>
+                            <p class="event-location">Prospect Park</p>
+                            <p class="event-time">12:00 PM - 8:00 PM</p>
+                        </div>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-date">
+                            <span class="day">18</span>
+                            <span class="month">JUN</span>
+                        </div>
+                        <div class="event-info">
+                            <h4 class="event-title">Art Gallery Opening</h4>
+                            <p class="event-location">Chelsea</p>
+                            <p class="event-time">6:00 PM - 9:00 PM</p>
+                        </div>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-date">
+                            <span class="day">22</span>
+                            <span class="month">JUN</span>
+                        </div>
+                        <div class="event-info">
+                            <h4 class="event-title">Tech Conference</h4>
+                            <p class="event-location">Javits Center</p>
+                            <p class="event-time">9:00 AM - 5:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Daily News</h4>
+                <p>Your comprehensive source for daily news and analysis.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Categories</h4>
+                <ul>
+                    <li><a href="#top-stories">Top Stories</a></li>
+                    <li><a href="#ny-news">NY News</a></li>
+                    <li><a href="#us-news">US News</a></li>
+                    <li><a href="#global-news">Global News</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>More</h4>
+                <ul>
+                    <li><a href="#opinion">Opinion</a></li>
+                    <li><a href="#arts">Arts & Culture</a></li>
+                    <li><a href="#fashion">Fashion</a></li>
+                    <li><a href="#events">Events</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Daily News. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

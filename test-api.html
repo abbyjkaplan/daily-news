@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test - Daily News Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .article {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .article h3 { margin-top: 0; }
+        .article-meta { color: #666; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>Daily News Platform - API Test</h1>
+    <p>This page tests your API keys and shows real news data.</p>
+    
+    <div class="test-section">
+        <h2>API Status</h2>
+        <div id="api-status">
+            <div class="status loading">Testing API connections...</div>
+        </div>
+        <button onclick="testAPIs()">Test All APIs</button>
+        <button onclick="clearCache()">Clear Cache</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Top Stories Test</h2>
+        <div id="top-stories-test">
+            <div class="status loading">Loading top stories...</div>
+        </div>
+        <button onclick="testTopStories()">Test Top Stories</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>New York News Test</h2>
+        <div id="ny-news-test">
+            <div class="status loading">Loading NY news...</div>
+        </div>
+        <button onclick="testNYNews()">Test NY News</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Debug Information</h2>
+        <div id="debug-info">
+            <p>Check the browser console (F12) for detailed logs.</p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        const newsAPI = new NewsAPI();
+        
+        async function testAPIs() {
+            const statusDiv = document.getElementById('api-status');
+            statusDiv.innerHTML = '<div class="status loading">Testing API connections...</div>';
+            
+            const results = [];
+            
+            // Test NewsAPI
+            try {
+                const response = await fetch(`https://newsapi.org/v2/top-headlines?country=us&pageSize=1&apiKey=${CONFIG.apiKeys.newsapi}`);
+                if (response.ok) {
+                    results.push('<div class="status success">✓ NewsAPI: Connected</div>');
+                } else {
+                    results.push(`<div class="status error">✗ NewsAPI: Error ${response.status}</div>`);
+                }
+            } catch (error) {
+                results.push(`<div class="status error">✗ NewsAPI: ${error.message}</div>`);
+            }
+            
+            // Test Guardian API
+            try {
+                const response = await fetch(`https://content.guardianapis.com/search?api-key=${CONFIG.apiKeys.guardian}`);
+                if (response.ok) {
+                    results.push('<div class="status success">✓ Guardian API: Connected</div>');
+                } else {
+                    results.push(`<div class="status error">✗ Guardian API: Error ${response.status}</div>`);
+                }
+            } catch (error) {
+                results.push(`<div class="status error">✗ Guardian API: ${error.message}</div>`);
+            }
+            
+            // Test NY Times API
+            try {
+                const response = await fetch(`https://api.nytimes.com/svc/topstories/v2/home.json?api-key=${CONFIG.apiKeys.nytimes}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.results && data.results.length > 0) {
+                        results.push('<div class="status success">✓ NY Times API: Connected</div>');
+                    } else {
+                        results.push('<div class="status error">✗ NY Times API: No results returned</div>');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    results.push(`<div class="status error">✗ NY Times API: Error ${response.status} - ${errorData.fault ? errorData.fault.faultstring : 'Unknown error'}</div>`);
+                }
+            } catch (error) {
+                results.push(`<div class="status error">✗ NY Times API: ${error.message}</div>`);
+            }
+            
+            statusDiv.innerHTML = results.join('');
+        }
+        
+        async function testTopStories() {
+            const testDiv = document.getElementById('top-stories-test');
+            testDiv.innerHTML = '<div class="status loading">Loading top stories...</div>';
+            
+            try {
+                const articles = await newsAPI.fetchTopStories();
+                console.log('Top stories result:', articles);
+                
+                if (articles && articles.length > 0) {
+                    let html = '<div class="status success">✓ Top stories loaded successfully</div>';
+                    articles.forEach(article => {
+                        html += `
+                            <div class="article">
+                                <h3>${article.headline}</h3>
+                                <p>${article.summary}</p>
+                                <div class="article-meta">
+                                    Source: ${article.source} | Time: ${article.time}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    testDiv.innerHTML = html;
+                } else {
+                    testDiv.innerHTML = '<div class="status error">✗ No articles returned</div>';
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<div class="status error">✗ Error: ${error.message}</div>`;
+                console.error('Top stories error:', error);
+            }
+        }
+        
+        async function testNYNews() {
+            const testDiv = document.getElementById('ny-news-test');
+            testDiv.innerHTML = '<div class="status loading">Loading NY news...</div>';
+            
+            try {
+                const articles = await newsAPI.fetchNYNews();
+                console.log('NY news result:', articles);
+                
+                if (articles && articles.length > 0) {
+                    let html = '<div class="status success">✓ NY news loaded successfully</div>';
+                    articles.forEach(article => {
+                        html += `
+                            <div class="article">
+                                <h3>${article.headline}</h3>
+                                <p>${article.summary}</p>
+                                <div class="article-meta">
+                                    Source: ${article.source} | Time: ${article.time}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    testDiv.innerHTML = html;
+                } else {
+                    testDiv.innerHTML = '<div class="status error">✗ No articles returned</div>';
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<div class="status error">✗ Error: ${error.message}</div>`;
+                console.error('NY news error:', error);
+            }
+        }
+        
+        function clearCache() {
+            localStorage.removeItem('newsCache');
+            alert('Cache cleared! Refresh the page to test with fresh data.');
+        }
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            testAPIs();
+            testTopStories();
+            testNYNews();
+        });
+    </script>
+</body>
+</html>

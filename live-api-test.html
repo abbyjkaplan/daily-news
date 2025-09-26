@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live API Test - Real Browser Testing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #d1ecf1; color: #0c5460; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .article {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .api-test {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Live API Test - Real Browser Testing</h1>
+    <p>This page tests the exact same API calls that the platform makes, in the same browser environment.</p>
+    
+    <div class="test-section">
+        <h2>Direct API Tests</h2>
+        <div id="direct-tests">
+            <button onclick="testNewsAPI()">Test NewsAPI</button>
+            <button onclick="testGuardianAPI()">Test Guardian API</button>
+            <button onclick="testNYTimesAPI()">Test NY Times API</button>
+            <button onclick="testAllAPIs()">Test All APIs</button>
+        </div>
+        <div id="direct-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Platform Integration Test</h2>
+        <div id="platform-test">
+            <button onclick="testPlatformIntegration()">Test Platform Integration</button>
+        </div>
+        <div id="platform-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Error Analysis</h2>
+        <div id="error-analysis">
+            <p>Check the browser console (F12) for detailed error logs.</p>
+        </div>
+    </div>
+
+    <script>
+        // Capture all console output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function logToPage(type, ...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            const errorDiv = document.getElementById('error-analysis');
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>[${timestamp}] ${type.toUpperCase()}:</strong> ${message}`;
+            div.style.marginBottom = '5px';
+            div.style.fontSize = '12px';
+            div.style.fontFamily = 'monospace';
+            div.style.backgroundColor = type === 'error' ? '#f8d7da' : type === 'warn' ? '#fff3cd' : '#d1ecf1';
+            div.style.padding = '5px';
+            div.style.borderRadius = '3px';
+            
+            errorDiv.appendChild(div);
+            errorDiv.scrollTop = errorDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logToPage('log', ...args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logToPage('error', ...args);
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            logToPage('warn', ...args);
+        };
+    </script>
+    
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        let newsAPI = null;
+        
+        async function testNewsAPI() {
+            const resultsDiv = document.getElementById('direct-results');
+            resultsDiv.innerHTML = '<div class="status loading">Testing NewsAPI...</div>';
+            
+            try {
+                console.log('=== TESTING NEWSAPI ===');
+                const url = 'https://newsapi.org/v2/top-headlines?country=us&apiKey=6ce6ad8f6dc149748aa5d88eaa26632e';
+                console.log('NewsAPI URL:', url);
+                
+                const response = await fetch(url);
+                console.log('NewsAPI Response Status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('NewsAPI Response Data:', data);
+                
+                if (data.status === 'ok' && data.articles && data.articles.length > 0) {
+                    resultsDiv.innerHTML = `
+                        <div class="status success">✓ NewsAPI working (${data.articles.length} articles)</div>
+                        <div class="api-test">
+                            <h4>Sample Article:</h4>
+                            <p><strong>Title:</strong> ${data.articles[0].title}</p>
+                            <p><strong>Source:</strong> ${data.articles[0].source.name}</p>
+                            <p><strong>URL:</strong> <a href="${data.articles[0].url}" target="_blank">${data.articles[0].url}</a></p>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">✗ NewsAPI returned no articles</div>';
+                }
+            } catch (error) {
+                console.error('NewsAPI Error:', error);
+                resultsDiv.innerHTML = `<div class="status error">✗ NewsAPI failed: ${error.message}</div>`;
+            }
+        }
+        
+        async function testGuardianAPI() {
+            const resultsDiv = document.getElementById('direct-results');
+            resultsDiv.innerHTML = '<div class="status loading">Testing Guardian API...</div>';
+            
+            try {
+                console.log('=== TESTING GUARDIAN API ===');
+                const url = 'https://content.guardianapis.com/search?api-key=4ee83d60-f3c2-432f-bccd-edda4bad2bbe&show-fields=headline,trailText,thumbnail';
+                console.log('Guardian API URL:', url);
+                
+                const response = await fetch(url);
+                console.log('Guardian API Response Status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Guardian API Response Data:', data);
+                
+                if (data.response && data.response.status === 'ok' && data.response.results && data.response.results.length > 0) {
+                    resultsDiv.innerHTML = `
+                        <div class="status success">✓ Guardian API working (${data.response.results.length} articles)</div>
+                        <div class="api-test">
+                            <h4>Sample Article:</h4>
+                            <p><strong>Title:</strong> ${data.response.results[0].webTitle}</p>
+                            <p><strong>Section:</strong> ${data.response.results[0].sectionName}</p>
+                            <p><strong>URL:</strong> <a href="${data.response.results[0].webUrl}" target="_blank">${data.response.results[0].webUrl}</a></p>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">✗ Guardian API returned no articles</div>';
+                }
+            } catch (error) {
+                console.error('Guardian API Error:', error);
+                resultsDiv.innerHTML = `<div class="status error">✗ Guardian API failed: ${error.message}</div>`;
+            }
+        }
+        
+        async function testNYTimesAPI() {
+            const resultsDiv = document.getElementById('direct-results');
+            resultsDiv.innerHTML = '<div class="status loading">Testing NY Times API...</div>';
+            
+            try {
+                console.log('=== TESTING NY TIMES API ===');
+                const url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=ryJNFYRNEe5nntlRnMCNJLnC1CQE6Juh&q=politics';
+                console.log('NY Times API URL:', url);
+                
+                const response = await fetch(url);
+                console.log('NY Times API Response Status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('NY Times API Response Data:', data);
+                
+                if (data.status === 'OK' && data.response && data.response.docs && data.response.docs.length > 0) {
+                    resultsDiv.innerHTML = `
+                        <div class="status success">✓ NY Times API working (${data.response.docs.length} articles)</div>
+                        <div class="api-test">
+                            <h4>Sample Article:</h4>
+                            <p><strong>Title:</strong> ${data.response.docs[0].headline.main}</p>
+                            <p><strong>Section:</strong> ${data.response.docs[0].section_name}</p>
+                            <p><strong>URL:</strong> <a href="${data.response.docs[0].web_url}" target="_blank">${data.response.docs[0].web_url}</a></p>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">✗ NY Times API returned no articles</div>';
+                }
+            } catch (error) {
+                console.error('NY Times API Error:', error);
+                resultsDiv.innerHTML = `<div class="status error">✗ NY Times API failed: ${error.message}</div>`;
+            }
+        }
+        
+        async function testAllAPIs() {
+            const resultsDiv = document.getElementById('direct-results');
+            resultsDiv.innerHTML = '<div class="status loading">Testing all APIs...</div>';
+            
+            const results = [];
+            
+            // Test NewsAPI
+            try {
+                const newsResponse = await fetch('https://newsapi.org/v2/top-headlines?country=us&apiKey=6ce6ad8f6dc149748aa5d88eaa26632e');
+                if (newsResponse.ok) {
+                    const newsData = await newsResponse.json();
+                    results.push(`✓ NewsAPI: ${newsData.articles ? newsData.articles.length : 0} articles`);
+                } else {
+                    results.push(`✗ NewsAPI: HTTP ${newsResponse.status}`);
+                }
+            } catch (error) {
+                results.push(`✗ NewsAPI: ${error.message}`);
+            }
+            
+            // Test Guardian API
+            try {
+                const guardianResponse = await fetch('https://content.guardianapis.com/search?api-key=4ee83d60-f3c2-432f-bccd-edda4bad2bbe&show-fields=headline,trailText,thumbnail');
+                if (guardianResponse.ok) {
+                    const guardianData = await guardianResponse.json();
+                    results.push(`✓ Guardian: ${guardianData.response?.results ? guardianData.response.results.length : 0} articles`);
+                } else {
+                    results.push(`✗ Guardian: HTTP ${guardianResponse.status}`);
+                }
+            } catch (error) {
+                results.push(`✗ Guardian: ${error.message}`);
+            }
+            
+            // Test NY Times API
+            try {
+                const nytResponse = await fetch('https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=ryJNFYRNEe5nntlRnMCNJLnC1CQE6Juh&q=politics');
+                if (nytResponse.ok) {
+                    const nytData = await nytResponse.json();
+                    results.push(`✓ NY Times: ${nytData.response?.docs ? nytData.response.docs.length : 0} articles`);
+                } else {
+                    results.push(`✗ NY Times: HTTP ${nytResponse.status}`);
+                }
+            } catch (error) {
+                results.push(`✗ NY Times: ${error.message}`);
+            }
+            
+            const successCount = results.filter(r => r.startsWith('✓')).length;
+            const totalCount = results.length;
+            
+            resultsDiv.innerHTML = `
+                <div class="status ${successCount === totalCount ? 'success' : 'error'}">
+                    ${successCount === totalCount ? '✓' : '⚠'} All APIs tested (${successCount}/${totalCount})
+                </div>
+                <pre>${results.join('\n')}</pre>
+            `;
+        }
+        
+        async function testPlatformIntegration() {
+            const resultsDiv = document.getElementById('platform-results');
+            resultsDiv.innerHTML = '<div class="status loading">Testing platform integration...</div>';
+            
+            try {
+                console.log('=== TESTING PLATFORM INTEGRATION ===');
+                
+                // Initialize NewsAPI
+                if (!newsAPI) {
+                    newsAPI = new NewsAPI();
+                    console.log('NewsAPI initialized');
+                }
+                
+                // Test clearCache
+                newsAPI.clearCache();
+                console.log('Cache cleared');
+                
+                // Test fetchTopStories
+                console.log('Fetching top stories...');
+                const topStories = await newsAPI.fetchTopStories();
+                console.log('Top stories result:', topStories);
+                
+                if (topStories && topStories.length > 0) {
+                    resultsDiv.innerHTML = `
+                        <div class="status success">✓ Platform integration working (${topStories.length} articles)</div>
+                        <div class="api-test">
+                            <h4>Sample Articles:</h4>
+                            ${topStories.slice(0, 3).map((article, index) => `
+                                <div class="article">
+                                    <h5>${index + 1}. ${article.headline}</h5>
+                                    <p>${article.summary}</p>
+                                    <p><strong>Source:</strong> ${article.source}</p>
+                                    <p><strong>URL:</strong> <a href="${article.url}" target="_blank">${article.url}</a></p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = '<div class="status error">✗ Platform integration returned no articles</div>';
+                }
+            } catch (error) {
+                console.error('Platform Integration Error:', error);
+                resultsDiv.innerHTML = `<div class="status error">✗ Platform integration failed: ${error.message}</div>`;
+            }
+        }
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            console.log('=== LIVE API TEST PAGE LOADED ===');
+            setTimeout(() => {
+                testAllAPIs();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

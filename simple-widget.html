@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>iPhone Widget</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Widget">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1));
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+        }
+
+        .widget-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        .date-section {
+            position: absolute;
+            top: 30px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .date {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .time {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .weather-section {
+            position: absolute;
+            top: 30px;
+            right: 20px;
+            z-index: 10;
+            text-align: right;
+        }
+
+        .weather-temp {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .weather-desc {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .weather-icon {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        .calendar-section {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            z-index: 10;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .calendar-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .calendar-event {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .event-time {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 2px;
+        }
+
+        .event-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .loading {
+            opacity: 0.6;
+            font-style: italic;
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 12px;
+        }
+
+        /* Hide scrollbar */
+        .calendar-section::-webkit-scrollbar {
+            display: none;
+        }
+
+        .calendar-section {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* iPhone specific optimizations */
+        @media (max-width: 430px) {
+            .date {
+                font-size: 20px;
+            }
+            
+            .weather-temp {
+                font-size: 24px;
+            }
+            
+            .weather-icon {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <!-- Date Section (Left Corner) -->
+        <div class="date-section">
+            <div class="date" id="currentDate"></div>
+            <div class="time" id="currentTime"></div>
+        </div>
+
+        <!-- Weather Section (Upper Right) -->
+        <div class="weather-section">
+            <div class="weather-icon" id="weatherIcon">🌤️</div>
+            <div class="weather-temp" id="weatherTemp">--°</div>
+            <div class="weather-desc" id="weatherDesc">Loading...</div>
+        </div>
+
+        <!-- Calendar Section (Bottom) -->
+        <div class="calendar-section">
+            <div class="calendar-title">Today's Schedule</div>
+            <div id="calendarEvents">
+                <div class="loading">Loading calendar...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Date and Time Display
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const timeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            };
+            
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', dateOptions);
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', timeOptions);
+        }
+
+        // Weather API Integration
+        async function fetchWeather() {
+            try {
+                // Using OpenWeatherMap API (you'll need to get a free API key)
+                const API_KEY = 'YOUR_OPENWEATHER_API_KEY'; // Replace with your API key
+                const city = 'New York'; // Replace with your city
+                const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.main) {
+                    document.getElementById('weatherTemp').textContent = `${Math.round(data.main.temp)}°C`;
+                    document.getElementById('weatherDesc').textContent = data.weather[0].description;
+                    
+                    // Weather icon mapping
+                    const iconMap = {
+                        '01d': '☀️', '01n': '🌙',
+                        '02d': '⛅', '02n': '☁️',
+                        '03d': '☁️', '03n': '☁️',
+                        '04d': '☁️', '04n': '☁️',
+                        '09d': '🌧️', '09n': '🌧️',
+                        '10d': '🌦️', '10n': '🌧️',
+                        '11d': '⛈️', '11n': '⛈️',
+                        '13d': '❄️', '13n': '❄️',
+                        '50d': '🌫️', '50n': '🌫️'
+                    };
+                    
+                    const icon = iconMap[data.weather[0].icon] || '🌤️';
+                    document.getElementById('weatherIcon').textContent = icon;
+                }
+            } catch (error) {
+                console.error('Weather fetch error:', error);
+                document.getElementById('weatherDesc').textContent = 'Weather unavailable';
+                document.getElementById('weatherTemp').textContent = '--°';
+            }
+        }
+
+        // Calendar Integration (Mock data)
+        function loadCalendarEvents() {
+            const mockEvents = [
+                { time: '9:00 AM', title: 'Team Meeting' },
+                { time: '11:30 AM', title: 'Lunch with Sarah' },
+                { time: '2:00 PM', title: 'Project Review' },
+                { time: '4:30 PM', title: 'Gym Session' }
+            ];
+
+            const eventsContainer = document.getElementById('calendarEvents');
+            eventsContainer.innerHTML = '';
+
+            if (mockEvents.length === 0) {
+                eventsContainer.innerHTML = '<div class="loading">No events today</div>';
+                return;
+            }
+
+            mockEvents.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'calendar-event';
+                eventDiv.innerHTML = `
+                    <div class="event-time">${event.time}</div>
+                    <div class="event-title">${event.title}</div>
+                `;
+                eventsContainer.appendChild(eventDiv);
+            });
+        }
+
+        // Initialize the widget
+        function initWidget() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            
+            fetchWeather();
+            setInterval(fetchWeather, 300000);
+            
+            loadCalendarEvents();
+        }
+
+        // Start the widget when page loads
+        document.addEventListener('DOMContentLoaded', initWidget);
+
+        // Handle visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                updateDateTime();
+                fetchWeather();
+            }
+        });
+    </script>
+</body>
+</html>

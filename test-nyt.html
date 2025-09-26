@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NY Times API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .article {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .article h3 { margin-top: 0; }
+        .article-meta { color: #666; font-size: 0.9em; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>NY Times API Debug Test</h1>
+    <p>This page tests the NY Times API with different endpoints to find the correct ones.</p>
+    
+    <div class="test-section">
+        <h2>API Key Test</h2>
+        <div id="api-key-test">
+            <div class="status loading">Testing API key...</div>
+        </div>
+        <button onclick="testAPIKey()">Test API Key</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Available Sections Test</h2>
+        <div id="sections-test">
+            <div class="status loading">Testing available sections...</div>
+        </div>
+        <button onclick="testSections()">Test Sections</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Home Section Test</h2>
+        <div id="home-test">
+            <div class="status loading">Testing home section...</div>
+        </div>
+        <button onclick="testHome()">Test Home Section</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Raw Response</h2>
+        <div id="raw-response">
+            <p>Click a test button above to see the raw API response here.</p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const API_KEY = CONFIG.apiKeys.nytimes;
+        const BASE_URL = 'https://api.nytimes.com/svc';
+        
+        async function testAPIKey() {
+            const testDiv = document.getElementById('api-key-test');
+            testDiv.innerHTML = '<div class="status loading">Testing API key...</div>';
+            
+            try {
+                // Test with a simple endpoint
+                const response = await fetch(`${BASE_URL}/topstories/v2/home.json?api-key=${API_KEY}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    testDiv.innerHTML = '<div class="status success">✓ API Key is valid</div>';
+                    document.getElementById('raw-response').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    testDiv.innerHTML = `<div class="status error">✗ API Error: ${response.status} - ${data.fault ? data.fault.faultstring : 'Unknown error'}</div>`;
+                    document.getElementById('raw-response').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<div class="status error">✗ Network Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testSections() {
+            const testDiv = document.getElementById('sections-test');
+            testDiv.innerHTML = '<div class="status loading">Testing available sections...</div>';
+            
+            const sections = ['home', 'world', 'national', 'politics', 'nyregion', 'business', 'opinion', 'technology', 'science', 'health', 'sports', 'arts', 'books', 'movies', 'theater', 'fashion', 'dining', 'travel', 'magazine', 'realestate'];
+            
+            const results = [];
+            
+            for (const section of sections.slice(0, 5)) { // Test first 5 sections
+                try {
+                    const response = await fetch(`${BASE_URL}/topstories/v2/${section}.json?api-key=${API_KEY}`);
+                    if (response.ok) {
+                        results.push(`<div class="status success">✓ ${section}: Available</div>`);
+                    } else {
+                        results.push(`<div class="status error">✗ ${section}: ${response.status}</div>`);
+                    }
+                } catch (error) {
+                    results.push(`<div class="status error">✗ ${section}: ${error.message}</div>`);
+                }
+            }
+            
+            testDiv.innerHTML = results.join('');
+        }
+        
+        async function testHome() {
+            const testDiv = document.getElementById('home-test');
+            testDiv.innerHTML = '<div class="status loading">Testing home section...</div>';
+            
+            try {
+                const response = await fetch(`${BASE_URL}/topstories/v2/home.json?api-key=${API_KEY}`);
+                const data = await response.json();
+                
+                if (response.ok && data.results) {
+                    testDiv.innerHTML = `<div class="status success">✓ Home section loaded: ${data.results.length} articles</div>`;
+                    
+                    let html = '<h3>Sample Articles:</h3>';
+                    data.results.slice(0, 3).forEach(article => {
+                        html += `
+                            <div class="article">
+                                <h3>${article.title}</h3>
+                                <p>${article.abstract}</p>
+                                <div class="article-meta">
+                                    Section: ${article.section} | Published: ${article.published_date}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    testDiv.innerHTML += html;
+                    
+                    document.getElementById('raw-response').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    testDiv.innerHTML = `<div class="status error">✗ Error: ${response.status}</div>`;
+                    document.getElementById('raw-response').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<div class="status error">✗ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Auto-run basic test on page load
+        window.addEventListener('load', () => {
+            testAPIKey();
+        });
+    </script>
+</body>
+</html>

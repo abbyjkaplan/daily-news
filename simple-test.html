@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Test - Daily News Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .article {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .read-more {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .read-more:hover {
+            color: #666;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Test - Daily News Platform</h1>
+    <p>This is a simplified test to verify the platform works correctly.</p>
+    
+    <div class="test-section">
+        <h2>Quick Status Check</h2>
+        <div id="quick-status" class="status loading">Checking platform status...</div>
+        <button onclick="quickCheck()">Run Quick Check</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Load Sample News</h2>
+        <div id="news-status" class="status loading">Ready to load news...</div>
+        <button onclick="loadSampleNews()">Load Sample News</button>
+        <div id="sample-news"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Debug Information</h2>
+        <div id="debug-info">
+            <p>Check the browser console (F12) for detailed logs.</p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        let newsAPI = null;
+        
+        function quickCheck() {
+            const statusDiv = document.getElementById('quick-status');
+            const debugDiv = document.getElementById('debug-info');
+            
+            let results = [];
+            
+            // Check 1: CONFIG loaded
+            if (typeof CONFIG !== 'undefined') {
+                results.push('✓ CONFIG loaded');
+            } else {
+                results.push('✗ CONFIG not loaded');
+            }
+            
+            // Check 2: NewsAPI class available
+            if (typeof NewsAPI !== 'undefined') {
+                results.push('✓ NewsAPI class available');
+            } else {
+                results.push('✗ NewsAPI class not available');
+            }
+            
+            // Check 3: Try to create instance
+            try {
+                newsAPI = new NewsAPI();
+                results.push('✓ NewsAPI instance created');
+            } catch (error) {
+                results.push(`✗ NewsAPI instance failed: ${error.message}`);
+            }
+            
+            // Check 4: Methods available
+            if (newsAPI) {
+                const methods = ['clearCache', 'fetchTopStories'];
+                const available = methods.filter(method => typeof newsAPI[method] === 'function');
+                if (available.length === methods.length) {
+                    results.push('✓ Required methods available');
+                } else {
+                    results.push(`✗ Missing methods: ${methods.filter(m => !available.includes(m)).join(', ')}`);
+                }
+            }
+            
+            const successCount = results.filter(r => r.startsWith('✓')).length;
+            const totalCount = results.length;
+            
+            if (successCount === totalCount) {
+                statusDiv.textContent = `✓ All checks passed (${successCount}/${totalCount})`;
+                statusDiv.className = 'status success';
+            } else {
+                statusDiv.textContent = `⚠ Some checks failed (${successCount}/${totalCount})`;
+                statusDiv.className = 'status error';
+            }
+            
+            debugDiv.innerHTML = '<pre>' + results.join('\n') + '</pre>';
+            console.log('Quick check results:', results);
+        }
+        
+        async function loadSampleNews() {
+            const statusDiv = document.getElementById('news-status');
+            const newsDiv = document.getElementById('sample-news');
+            
+            statusDiv.textContent = 'Loading news...';
+            statusDiv.className = 'status loading';
+            
+            if (!newsAPI) {
+                try {
+                    newsAPI = new NewsAPI();
+                } catch (error) {
+                    statusDiv.textContent = `✗ Failed to create NewsAPI: ${error.message}`;
+                    statusDiv.className = 'status error';
+                    return;
+                }
+            }
+            
+            try {
+                // Clear cache first
+                newsAPI.clearCache();
+                
+                // Fetch top stories
+                const articles = await newsAPI.fetchTopStories();
+                
+                if (articles && articles.length > 0) {
+                    statusDiv.textContent = `✓ Loaded ${articles.length} articles`;
+                    statusDiv.className = 'status success';
+                    
+                    let html = '<h3>Sample Articles:</h3>';
+                    articles.slice(0, 3).forEach((article, index) => {
+                        html += `
+                            <div class="article">
+                                <h4>${index + 1}. ${article.headline}</h4>
+                                <p>${article.summary}</p>
+                                <p><strong>Source:</strong> ${article.source}</p>
+                                <p><strong>Time:</strong> ${article.time}</p>
+                                <p><strong>URL:</strong> <a href="${article.url}" class="read-more" target="_blank" rel="noopener noreferrer">Read Full Article →</a></p>
+                            </div>
+                        `;
+                    });
+                    newsDiv.innerHTML = html;
+                } else {
+                    statusDiv.textContent = '⚠ No articles returned';
+                    statusDiv.className = 'status error';
+                    newsDiv.innerHTML = '<p>No articles were returned. This might be due to API configuration or network issues.</p>';
+                }
+            } catch (error) {
+                statusDiv.textContent = `✗ Error: ${error.message}`;
+                statusDiv.className = 'status error';
+                newsDiv.innerHTML = `<p>Error loading news: ${error.message}</p>`;
+                console.error('News loading error:', error);
+            }
+        }
+        
+        // Auto-run quick check on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                quickCheck();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

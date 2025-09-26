@@ -291,6 +291,7 @@ class NewsAPI {
     // Fetch Opinion Articles
     async fetchOpinion() {
         console.log('=== fetchOpinion method called ===');
+        console.log('=== DEBUGGING IS WORKING ===');
         try {
             this.loadCache();
             

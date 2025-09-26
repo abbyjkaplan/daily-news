@@ -900,22 +900,7 @@ function addReadingTime() {
     
     articles.forEach(article => {
         const text = article.textContent;
-        const wordCount = text.split(/\s+/).length;
-        const readingTime = Math.ceil(wordCount / 200); // Average reading speed: 200 words per minute
-        
-        const readingTimeElement = document.createElement('span');
-        readingTimeElement.className = 'reading-time';
-        readingTimeElement.textContent = `${readingTime} min read`;
-        readingTimeElement.style.cssText = `
-            font-size: 0.8rem;
-            color: #999;
-            font-style: italic;
-        `;
-        
-        const readMoreLink = article.querySelector('.read-more');
-        if (readMoreLink) {
-            readMoreLink.parentNode.insertBefore(readingTimeElement, readMoreLink);
-        }
+        // Reading time functionality removed as requested
     });
 }
 

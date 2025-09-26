@@ -587,6 +587,7 @@ class NewsAPI {
         const articles = [];
         console.log(`Processing articles from source ${sourceIndex}:`, data);
         console.log(`Data type: ${typeof data}, Data keys:`, data ? Object.keys(data) : 'null');
+        console.log(`Full data structure:`, JSON.stringify(data, null, 2));
         
         switch (sourceIndex) {
             case 0: // NewsAPI

@@ -290,6 +290,7 @@ class NewsAPI {
 
     // Fetch Opinion Articles
     async fetchOpinion() {
+        console.log('=== fetchOpinion method called ===');
         try {
             this.loadCache();
             
@@ -300,6 +301,7 @@ class NewsAPI {
             // }
             
             console.log('Fetching fresh opinion articles...');
+            console.log('About to create sources array...');
             
             const sources = [
                 () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'news' }),

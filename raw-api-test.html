@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raw API Test - Daily News Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .api-result {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Raw API Test - Daily News Platform</h1>
+    
+    <div class="test-section">
+        <h2>🧪 Test Raw API Responses</h2>
+        <button onclick="testRawAPIs()">Test All Raw APIs</button>
+        <button onclick="testGuardianRaw()">Test Guardian Raw</button>
+        <button onclick="testNYTimesRaw()">Test NY Times Raw</button>
+        <button onclick="testNewsAPIRaw()">Test NewsAPI Raw</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Raw API Results</h2>
+        <div id="test-results" class="test-results">
+            <div class="status info">Click the test buttons above to see raw API responses...</div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        let newsAPI;
+        
+        // Initialize NewsAPI
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                newsAPI = new NewsAPI();
+                console.log('NewsAPI initialized successfully');
+            } catch (error) {
+                console.error('Error initializing NewsAPI:', error);
+            }
+        });
+
+        async function testRawAPIs() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing all raw APIs...</div>';
+            
+            let html = '<h3>Raw API Responses:</h3>';
+            
+            // Test Guardian
+            html += await testRawAPI('Guardian', () => newsAPI.fetchFromGuardian('/search', { 
+                'show-fields': 'headline,trailText,thumbnail', 
+                q: 'opinion OR editorial OR commentary' 
+            }));
+            
+            // Test NY Times
+            html += await testRawAPI('NY Times', () => newsAPI.fetchFromNYTimes('/search/v2/articlesearch.json', { 
+                q: 'opinion OR editorial OR commentary' 
+            }));
+            
+            // Test NewsAPI
+            html += await testRawAPI('NewsAPI', () => newsAPI.fetchFromNewsAPI('/everything', { 
+                q: 'opinion OR editorial OR commentary',
+                sortBy: 'publishedAt',
+                pageSize: 10
+            }));
+            
+            results.innerHTML = html;
+        }
+
+        async function testGuardianRaw() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing Guardian raw API...</div>';
+            
+            const html = await testRawAPI('Guardian', () => newsAPI.fetchFromGuardian('/search', { 
+                'show-fields': 'headline,trailText,thumbnail', 
+                q: 'opinion OR editorial OR commentary' 
+            }));
+            
+            results.innerHTML = html;
+        }
+
+        async function testNYTimesRaw() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing NY Times raw API...</div>';
+            
+            const html = await testRawAPI('NY Times', () => newsAPI.fetchFromNYTimes('/search/v2/articlesearch.json', { 
+                q: 'opinion OR editorial OR commentary' 
+            }));
+            
+            results.innerHTML = html;
+        }
+
+        async function testNewsAPIRaw() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing NewsAPI raw API...</div>';
+            
+            const html = await testRawAPI('NewsAPI', () => newsAPI.fetchFromNewsAPI('/everything', { 
+                q: 'opinion OR editorial OR commentary',
+                sortBy: 'publishedAt',
+                pageSize: 10
+            }));
+            
+            results.innerHTML = html;
+        }
+
+        async function testRawAPI(apiName, apiCall) {
+            let html = `<div class="api-result"><h3>${apiName} Raw Response:</h3>`;
+            
+            try {
+                const result = await apiCall();
+                
+                if (result) {
+                    html += `<div class="status success">✓ ${apiName} API returned data</div>`;
+                    html += '<h4>Full Response Structure:</h4>';
+                    html += '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+                    
+                    // Analyze the structure
+                    html += '<h4>Structure Analysis:</h4>';
+                    if (result.response && result.response.results) {
+                        html += `<div class="status success">✓ Guardian format detected: ${result.response.results.length} results</div>`;
+                    } else if (result.response && result.response.docs) {
+                        html += `<div class="status success">✓ NY Times format detected: ${result.response.docs.length} results</div>`;
+                    } else if (result.articles) {
+                        html += `<div class="status success">✓ NewsAPI format detected: ${result.articles.length} results</div>`;
+                    } else {
+                        html += '<div class="status warning">⚠ Unknown format - check structure above</div>';
+                    }
+                } else {
+                    html += `<div class="status error">✗ ${apiName} API returned null/undefined</div>`;
+                }
+                
+            } catch (error) {
+                html += `<div class="status error">✗ ${apiName} API Error: ${error.message}</div>`;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+    </script>
+</body>
+</html>

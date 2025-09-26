@@ -306,7 +306,9 @@ class NewsAPI {
                 () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'news' })
             ];
             
+            console.log('About to call APIs...');
             const results = await Promise.allSettled(sources.map(source => source()));
+            console.log('API calls completed. Results:', results);
             const articles = [];
             
             results.forEach((result, index) => {
@@ -515,6 +517,7 @@ class NewsAPI {
 
     // Fetch from Guardian API
     async fetchFromGuardian(endpoint, params = {}) {
+        console.log('Guardian API called with:', endpoint, params);
         if (!this.apiKeys.guardian || this.apiKeys.guardian === 'your-guardian-key-here') {
             console.warn('Guardian API key not configured, skipping...');
             return null;
@@ -543,6 +546,7 @@ class NewsAPI {
 
     // Fetch from NY Times API
     async fetchFromNYTimes(endpoint, params = {}) {
+        console.log('NY Times API called with:', endpoint, params);
         if (!this.apiKeys.nytimes || this.apiKeys.nytimes === 'your-nytimes-key-here') {
             console.warn('NY Times API key not configured, skipping...');
             return null;

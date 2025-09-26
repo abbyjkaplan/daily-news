@@ -307,8 +307,14 @@ class NewsAPI {
             ];
             
             console.log('About to call APIs...');
-            const results = await Promise.allSettled(sources.map(source => source()));
-            console.log('API calls completed. Results:', results);
+            let results;
+            try {
+                results = await Promise.allSettled(sources.map(source => source()));
+                console.log('API calls completed. Results:', results);
+            } catch (error) {
+                console.error('Error in Promise.allSettled:', error);
+                return [];
+            }
             const articles = [];
             
             results.forEach((result, index) => {

@@ -559,6 +559,7 @@ class NewsAPI {
     // Process articles from different sources
     processArticles(data, sourceIndex) {
         const articles = [];
+        console.log(`Processing articles from source ${sourceIndex}:`, data);
         
         switch (sourceIndex) {
             case 0: // NewsAPI
@@ -627,14 +628,16 @@ class NewsAPI {
                 break;
         }
         
+        console.log(`Processed ${articles.length} articles from source ${sourceIndex}`);
         return articles;
     }
 
     // Rank articles by relevance and recency
     rankArticles(articles) {
-        return articles
-            .filter(article => article.headline && article.url)
-            .sort((a, b) => {
+        console.log(`Ranking ${articles.length} articles`);
+        const filtered = articles.filter(article => article.headline && article.url);
+        console.log(`After filtering: ${filtered.length} articles`);
+        return filtered.sort((a, b) => {
                 let scoreA = 0;
                 let scoreB = 0;
                 

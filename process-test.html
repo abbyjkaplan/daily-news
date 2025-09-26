@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Test - Daily News Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .step {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Process Test - Daily News Platform</h1>
+    
+    <div class="test-section">
+        <h2>🧪 Test Article Processing Pipeline</h2>
+        <button onclick="testOpinionProcessing()">Test Opinion Processing</button>
+        <button onclick="testArtsProcessing()">Test Arts Processing</button>
+        <button onclick="testFashionProcessing()">Test Fashion Processing</button>
+        <button onclick="testEventsProcessing()">Test Events Processing</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Processing Results</h2>
+        <div id="test-results" class="test-results">
+            <div class="status info">Click the test buttons above to see the processing pipeline...</div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        let newsAPI;
+        
+        // Initialize NewsAPI
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                newsAPI = new NewsAPI();
+                console.log('NewsAPI initialized successfully');
+            } catch (error) {
+                console.error('Error initializing NewsAPI:', error);
+            }
+        });
+
+        async function testOpinionProcessing() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing Opinion processing pipeline...</div>';
+            
+            try {
+                const articles = await newsAPI.fetchOpinion();
+                let html = '<h3>Opinion Processing Pipeline:</h3>';
+                
+                html += `<div class="step"><strong>Step 1 - Raw API Results:</strong> ${articles ? articles.length : 0} articles</div>`;
+                
+                if (articles && articles.length > 0) {
+                    html += '<div class="step"><strong>Step 2 - Sample Articles:</strong></div>';
+                    html += '<pre>' + JSON.stringify(articles.slice(0, 2), null, 2) + '</pre>';
+                    
+                    html += '<div class="step"><strong>Step 3 - Article Validation:</strong></div>';
+                    articles.forEach((article, index) => {
+                        const hasHeadline = article.headline ? '✓' : '✗';
+                        const hasUrl = article.url ? '✓' : '✗';
+                        const hasSummary = article.summary ? '✓' : '✗';
+                        html += `<div>Article ${index + 1}: Headline ${hasHeadline}, URL ${hasUrl}, Summary ${hasSummary}</div>`;
+                    });
+                } else {
+                    html += '<div class="status warning">⚠ No articles returned from Opinion API</div>';
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="status error">✗ Error testing Opinion processing: ${error.message}</div>`;
+            }
+        }
+
+        async function testArtsProcessing() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing Arts processing pipeline...</div>';
+            
+            try {
+                const articles = await newsAPI.fetchArtsCulture();
+                let html = '<h3>Arts & Culture Processing Pipeline:</h3>';
+                
+                html += `<div class="step"><strong>Step 1 - Raw API Results:</strong> ${articles ? articles.length : 0} articles</div>`;
+                
+                if (articles && articles.length > 0) {
+                    html += '<div class="step"><strong>Step 2 - Sample Articles:</strong></div>';
+                    html += '<pre>' + JSON.stringify(articles.slice(0, 2), null, 2) + '</pre>';
+                } else {
+                    html += '<div class="status warning">⚠ No articles returned from Arts API</div>';
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="status error">✗ Error testing Arts processing: ${error.message}</div>`;
+            }
+        }
+
+        async function testFashionProcessing() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing Fashion processing pipeline...</div>';
+            
+            try {
+                const articles = await newsAPI.fetchFashionTrends();
+                let html = '<h3>Fashion & Trends Processing Pipeline:</h3>';
+                
+                html += `<div class="step"><strong>Step 1 - Raw API Results:</strong> ${articles ? articles.length : 0} articles</div>`;
+                
+                if (articles && articles.length > 0) {
+                    html += '<div class="step"><strong>Step 2 - Sample Articles:</strong></div>';
+                    html += '<pre>' + JSON.stringify(articles.slice(0, 2), null, 2) + '</pre>';
+                } else {
+                    html += '<div class="status warning">⚠ No articles returned from Fashion API</div>';
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="status error">✗ Error testing Fashion processing: ${error.message}</div>`;
+            }
+        }
+
+        async function testEventsProcessing() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing Events processing pipeline...</div>';
+            
+            try {
+                const articles = await newsAPI.fetchNYEvents();
+                let html = '<h3>NY Events Processing Pipeline:</h3>';
+                
+                html += `<div class="step"><strong>Step 1 - Raw API Results:</strong> ${articles ? articles.length : 0} articles</div>`;
+                
+                if (articles && articles.length > 0) {
+                    html += '<div class="step"><strong>Step 2 - Sample Articles:</strong></div>';
+                    html += '<pre>' + JSON.stringify(articles.slice(0, 2), null, 2) + '</pre>';
+                } else {
+                    html += '<div class="status warning">⚠ No articles returned from Events API</div>';
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="status error">✗ Error testing Events processing: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

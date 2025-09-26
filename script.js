@@ -55,63 +55,63 @@ async function loadRealTimeNews() {
             updateTopStories(topStories.value);
         } else {
             console.warn('Top stories failed or empty:', topStories.reason || 'No articles returned');
-            // Try to load mock data as fallback
-            try {
-                const mockData = newsAPI.getMockTopStories();
-                updateTopStories(mockData);
-                console.log('Using mock data for top stories');
-            } catch (error) {
-                console.error('Failed to load mock data:', error);
-            }
+            updateTopStories([]);
         }
         
-        if (nyNews.status === 'fulfilled') {
+        if (nyNews.status === 'fulfilled' && nyNews.value && nyNews.value.length > 0) {
             console.log('NY news loaded:', nyNews.value.length, 'articles');
             updateNYNews(nyNews.value);
         } else {
-            console.error('NY news failed:', nyNews.reason);
+            console.warn('NY news failed or empty:', nyNews.reason || 'No articles returned');
+            updateNYNews([]);
         }
         
-        if (usNews.status === 'fulfilled') {
+        if (usNews.status === 'fulfilled' && usNews.value && usNews.value.length > 0) {
             console.log('US news loaded:', usNews.value.length, 'articles');
             updateUSNews(usNews.value);
         } else {
-            console.error('US news failed:', usNews.reason);
+            console.warn('US news failed or empty:', usNews.reason || 'No articles returned');
+            updateUSNews([]);
         }
         
-        if (globalNews.status === 'fulfilled') {
+        if (globalNews.status === 'fulfilled' && globalNews.value && globalNews.value.length > 0) {
             console.log('Global news loaded:', globalNews.value.length, 'articles');
             updateGlobalNews(globalNews.value);
         } else {
-            console.error('Global news failed:', globalNews.reason);
+            console.warn('Global news failed or empty:', globalNews.reason || 'No articles returned');
+            updateGlobalNews([]);
         }
         
-        if (opinion.status === 'fulfilled') {
+        if (opinion.status === 'fulfilled' && opinion.value && opinion.value.length > 0) {
             console.log('Opinion loaded:', opinion.value.length, 'articles');
             updateOpinion(opinion.value);
         } else {
-            console.error('Opinion failed:', opinion.reason);
+            console.warn('Opinion failed or empty:', opinion.reason || 'No articles returned');
+            updateOpinion([]);
         }
         
-        if (arts.status === 'fulfilled') {
+        if (arts.status === 'fulfilled' && arts.value && arts.value.length > 0) {
             console.log('Arts & culture loaded:', arts.value.length, 'articles');
             updateArtsCulture(arts.value);
         } else {
-            console.error('Arts & culture failed:', arts.reason);
+            console.warn('Arts & culture failed or empty:', arts.reason || 'No articles returned');
+            updateArtsCulture([]);
         }
         
-        if (fashion.status === 'fulfilled') {
+        if (fashion.status === 'fulfilled' && fashion.value && fashion.value.length > 0) {
             console.log('Fashion loaded:', fashion.value.length, 'articles');
             updateFashionTrends(fashion.value);
         } else {
-            console.error('Fashion failed:', fashion.reason);
+            console.warn('Fashion failed or empty:', fashion.reason || 'No articles returned');
+            updateFashionTrends([]);
         }
         
-        if (events.status === 'fulfilled') {
+        if (events.status === 'fulfilled' && events.value && events.value.length > 0) {
             console.log('Events loaded:', events.value.length, 'articles');
             updateNYEvents(events.value);
         } else {
-            console.error('Events failed:', events.reason);
+            console.warn('Events failed or empty:', events.reason || 'No articles returned');
+            updateNYEvents([]);
         }
         
         // Hide loading indicators

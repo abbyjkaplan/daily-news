@@ -137,8 +137,8 @@ class NewsAPI {
                 this.saveCache();
                 return ranked;
             } else {
-                // Return mock data if no real articles
-                return this.getMockTopStories();
+                // Return empty array if no real articles
+                return [];
             }
             
         } catch (error) {
@@ -185,7 +185,7 @@ class NewsAPI {
                 this.saveCache();
                 return ranked;
             } else {
-                return this.getMockNYNews();
+                return [];
             }
             
         } catch (error) {
@@ -232,7 +232,7 @@ class NewsAPI {
                 this.saveCache();
                 return ranked;
             } else {
-                return this.getMockUSNews();
+                return [];
             }
             
         } catch (error) {
@@ -279,7 +279,7 @@ class NewsAPI {
                 this.saveCache();
                 return ranked;
             } else {
-                return this.getMockGlobalNews();
+                return [];
             }
             
         } catch (error) {
@@ -325,7 +325,7 @@ class NewsAPI {
                 this.saveCache();
                 return ranked;
             } else {
-                return this.getMockOpinion();
+                return [];
             }
             
         } catch (error) {
@@ -371,7 +371,7 @@ class NewsAPI {
                 this.saveCache();
                 return ranked;
             } else {
-                return this.getMockArtsCulture();
+                return [];
             }
             
         } catch (error) {
@@ -417,7 +417,7 @@ class NewsAPI {
                 this.saveCache();
                 return ranked;
             } else {
-                return this.getMockFashionTrends();
+                return [];
             }
             
         } catch (error) {
@@ -463,7 +463,7 @@ class NewsAPI {
                 this.saveCache();
                 return ranked;
             } else {
-                return this.getMockNYEvents();
+                return [];
             }
             
         } catch (error) {
@@ -567,7 +567,7 @@ class NewsAPI {
                         articles.push({
                             headline: article.title,
                             summary: article.description,
-                            image: article.urlToImage,
+                            image: article.urlToImage || 'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=No+Image',
                             source: article.source.name,
                             time: this.formatTime(article.publishedAt),
                             url: article.url,
@@ -584,7 +584,7 @@ class NewsAPI {
                         articles.push({
                             headline: article.webTitle,
                             summary: article.fields?.trailText || article.webTitle,
-                            image: article.fields?.thumbnail,
+                            image: article.fields?.thumbnail || 'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=No+Image',
                             source: 'The Guardian',
                             time: this.formatTime(article.webPublicationDate),
                             url: article.webUrl,
@@ -601,7 +601,7 @@ class NewsAPI {
                         articles.push({
                             headline: article.headline?.main || article.title,
                             summary: article.abstract || article.snippet,
-                            image: article.multimedia?.[0]?.url ? `https://static01.nyt.com/${article.multimedia[0].url}` : '',
+                            image: article.multimedia?.[0]?.url ? `https://static01.nyt.com/${article.multimedia[0].url}` : 'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=No+Image',
                             source: 'The New York Times',
                             time: this.formatTime(article.pub_date),
                             url: article.web_url,
@@ -615,7 +615,7 @@ class NewsAPI {
                         articles.push({
                             headline: article.title,
                             summary: article.abstract,
-                            image: article.multimedia?.[0]?.url ? `https://static01.nyt.com/${article.multimedia[0].url}` : '',
+                            image: article.multimedia?.[0]?.url ? `https://static01.nyt.com/${article.multimedia[0].url}` : 'https://via.placeholder.com/600x400/1a1a1a/ffffff?text=No+Image',
                             source: 'The New York Times',
                             time: this.formatTime(article.published_date),
                             url: article.url,

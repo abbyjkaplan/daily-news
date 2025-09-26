@@ -607,8 +607,10 @@ class NewsAPI {
                 }
                 break;
                 
-            case 1: // Guardian
+            case 0: // Guardian (source 0)
                 console.log('Guardian data check:', data.response && data.response.results);
+                console.log('Guardian response exists:', !!data.response);
+                console.log('Guardian results exist:', !!data.response?.results);
                 if (data.response && data.response.results) {
                     console.log(`Found ${data.response.results.length} Guardian articles`);
                     data.response.results.forEach(article => {
@@ -628,7 +630,7 @@ class NewsAPI {
                 }
                 break;
                 
-            case 2: // NY Times
+            case 1: // NY Times (source 1)
                 console.log('NY Times data check:', data.response && data.response.docs);
                 if (data.response && data.response.docs) {
                     console.log(`Found ${data.response.docs.length} NY Times articles`);

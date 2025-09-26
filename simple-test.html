@@ -7,10 +7,10 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background: #f5f5f5;
         }
         .test-section {
             background: white;
@@ -23,13 +23,13 @@
             padding: 10px;
             margin: 10px 0;
             border-radius: 4px;
-            font-weight: bold;
         }
-        .success { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
-        .loading { background-color: #d1ecf1; color: #0c5460; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
         button {
-            background-color: #007bff;
+            background: #007bff;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -37,174 +37,94 @@
             cursor: pointer;
             margin: 5px;
         }
-        button:hover { background-color: #0056b3; }
-        .article {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 4px;
-        }
-        .read-more {
-            color: #1a1a1a;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-        .read-more:hover {
-            color: #666;
-        }
+        button:hover { background: #0056b3; }
         pre {
             background: #f8f9fa;
-            padding: 10px;
+            padding: 15px;
             border-radius: 4px;
             overflow-x: auto;
-            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
         }
     </style>
 </head>
 <body>
-    <h1>Simple Test - Daily News Platform</h1>
-    <p>This is a simplified test to verify the platform works correctly.</p>
+    <h1>🔍 Simple Test - Daily News Platform</h1>
     
     <div class="test-section">
-        <h2>Quick Status Check</h2>
-        <div id="quick-status" class="status loading">Checking platform status...</div>
-        <button onclick="quickCheck()">Run Quick Check</button>
+        <h2>🧪 Test Opinion Section</h2>
+        <button onclick="testOpinion()">Test Opinion Section</button>
+        <button onclick="clearCache()">Clear Cache</button>
     </div>
-    
+
     <div class="test-section">
-        <h2>Load Sample News</h2>
-        <div id="news-status" class="status loading">Ready to load news...</div>
-        <button onclick="loadSampleNews()">Load Sample News</button>
-        <div id="sample-news"></div>
-    </div>
-    
-    <div class="test-section">
-        <h2>Debug Information</h2>
-        <div id="debug-info">
-            <p>Check the browser console (F12) for detailed logs.</p>
+        <h2>📊 Test Results</h2>
+        <div id="test-results" class="test-results">
+            <div class="status info">Click "Test Opinion Section" to see what happens...</div>
         </div>
     </div>
 
     <script src="config.js"></script>
     <script src="news-api.js"></script>
     <script>
-        let newsAPI = null;
+        let newsAPI;
         
-        function quickCheck() {
-            const statusDiv = document.getElementById('quick-status');
-            const debugDiv = document.getElementById('debug-info');
-            
-            let results = [];
-            
-            // Check 1: CONFIG loaded
-            if (typeof CONFIG !== 'undefined') {
-                results.push('✓ CONFIG loaded');
-            } else {
-                results.push('✗ CONFIG not loaded');
-            }
-            
-            // Check 2: NewsAPI class available
-            if (typeof NewsAPI !== 'undefined') {
-                results.push('✓ NewsAPI class available');
-            } else {
-                results.push('✗ NewsAPI class not available');
-            }
-            
-            // Check 3: Try to create instance
+        // Initialize NewsAPI
+        document.addEventListener('DOMContentLoaded', () => {
             try {
                 newsAPI = new NewsAPI();
-                results.push('✓ NewsAPI instance created');
+                console.log('NewsAPI initialized successfully');
             } catch (error) {
-                results.push(`✗ NewsAPI instance failed: ${error.message}`);
+                console.error('Error initializing NewsAPI:', error);
             }
-            
-            // Check 4: Methods available
-            if (newsAPI) {
-                const methods = ['clearCache', 'fetchTopStories'];
-                const available = methods.filter(method => typeof newsAPI[method] === 'function');
-                if (available.length === methods.length) {
-                    results.push('✓ Required methods available');
-                } else {
-                    results.push(`✗ Missing methods: ${methods.filter(m => !available.includes(m)).join(', ')}`);
-                }
-            }
-            
-            const successCount = results.filter(r => r.startsWith('✓')).length;
-            const totalCount = results.length;
-            
-            if (successCount === totalCount) {
-                statusDiv.textContent = `✓ All checks passed (${successCount}/${totalCount})`;
-                statusDiv.className = 'status success';
-            } else {
-                statusDiv.textContent = `⚠ Some checks failed (${successCount}/${totalCount})`;
-                statusDiv.className = 'status error';
-            }
-            
-            debugDiv.innerHTML = '<pre>' + results.join('\n') + '</pre>';
-            console.log('Quick check results:', results);
-        }
-        
-        async function loadSampleNews() {
-            const statusDiv = document.getElementById('news-status');
-            const newsDiv = document.getElementById('sample-news');
-            
-            statusDiv.textContent = 'Loading news...';
-            statusDiv.className = 'status loading';
-            
-            if (!newsAPI) {
-                try {
-                    newsAPI = new NewsAPI();
-                } catch (error) {
-                    statusDiv.textContent = `✗ Failed to create NewsAPI: ${error.message}`;
-                    statusDiv.className = 'status error';
-                    return;
-                }
-            }
+        });
+
+        async function testOpinion() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing Opinion section...</div>';
             
             try {
-                // Clear cache first
-                newsAPI.clearCache();
+                console.log('Starting Opinion test...');
                 
-                // Fetch top stories
-                const articles = await newsAPI.fetchTopStories();
+                // Test the fetchOpinion method directly
+                const articles = await newsAPI.fetchOpinion();
+                console.log('Opinion articles result:', articles);
+                
+                let html = '<h3>Opinion Test Results:</h3>';
+                html += `<div class="status info">Articles returned: ${articles ? articles.length : 0}</div>`;
                 
                 if (articles && articles.length > 0) {
-                    statusDiv.textContent = `✓ Loaded ${articles.length} articles`;
-                    statusDiv.className = 'status success';
-                    
-                    let html = '<h3>Sample Articles:</h3>';
-                    articles.slice(0, 3).forEach((article, index) => {
-                        html += `
-                            <div class="article">
-                                <h4>${index + 1}. ${article.headline}</h4>
-                                <p>${article.summary}</p>
-                                <p><strong>Source:</strong> ${article.source}</p>
-                                <p><strong>Time:</strong> ${article.time}</p>
-                                <p><strong>URL:</strong> <a href="${article.url}" class="read-more" target="_blank" rel="noopener noreferrer">Read Full Article →</a></p>
-                            </div>
-                        `;
-                    });
-                    newsDiv.innerHTML = html;
+                    html += '<div class="status success">✓ Opinion section has articles!</div>';
+                    html += '<h4>Sample Articles:</h4>';
+                    html += '<pre>' + JSON.stringify(articles.slice(0, 2), null, 2) + '</pre>';
                 } else {
-                    statusDiv.textContent = '⚠ No articles returned';
-                    statusDiv.className = 'status error';
-                    newsDiv.innerHTML = '<p>No articles were returned. This might be due to API configuration or network issues.</p>';
+                    html += '<div class="status warning">⚠ No articles returned</div>';
                 }
+                
+                results.innerHTML = html;
+                
             } catch (error) {
-                statusDiv.textContent = `✗ Error: ${error.message}`;
-                statusDiv.className = 'status error';
-                newsDiv.innerHTML = `<p>Error loading news: ${error.message}</p>`;
-                console.error('News loading error:', error);
+                console.error('Opinion test error:', error);
+                results.innerHTML = `<div class="status error">✗ Error: ${error.message}</div>`;
             }
         }
-        
-        // Auto-run quick check on page load
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                quickCheck();
-            }, 500);
-        });
+
+        async function clearCache() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Clearing cache...</div>';
+            
+            try {
+                if (newsAPI && newsAPI.clearCache) {
+                    newsAPI.clearCache();
+                    results.innerHTML = '<div class="status success">✓ Cache cleared</div>';
+                } else {
+                    results.innerHTML = '<div class="status error">✗ NewsAPI not available</div>';
+                }
+            } catch (error) {
+                results.innerHTML = `<div class="status error">✗ Error clearing cache: ${error.message}</div>`;
+            }
+        }
     </script>
 </body>
 </html>

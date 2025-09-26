@@ -293,9 +293,11 @@ class NewsAPI {
         try {
             this.loadCache();
             
-            if (!this.needsUpdate() && this.cache.data.opinion) {
-                return this.cache.data.opinion;
-            }
+            // Temporarily bypass cache for testing
+            console.log('Bypassing cache for Opinion - fetching fresh data');
+            // if (!this.needsUpdate() && this.cache.data.opinion) {
+            //     return this.cache.data.opinion;
+            // }
             
             console.log('Fetching fresh opinion articles...');
             
@@ -339,9 +341,11 @@ class NewsAPI {
         try {
             this.loadCache();
             
-            if (!this.needsUpdate() && this.cache.data.artsCulture) {
-                return this.cache.data.artsCulture;
-            }
+            // Temporarily bypass cache for testing
+            console.log('Bypassing cache for Arts - fetching fresh data');
+            // if (!this.needsUpdate() && this.cache.data.artsCulture) {
+            //     return this.cache.data.artsCulture;
+            // }
             
             console.log('Fetching fresh arts & culture...');
             
@@ -385,9 +389,11 @@ class NewsAPI {
         try {
             this.loadCache();
             
-            if (!this.needsUpdate() && this.cache.data.fashionTrends) {
-                return this.cache.data.fashionTrends;
-            }
+            // Temporarily bypass cache for testing
+            console.log('Bypassing cache for Fashion - fetching fresh data');
+            // if (!this.needsUpdate() && this.cache.data.fashionTrends) {
+            //     return this.cache.data.fashionTrends;
+            // }
             
             console.log('Fetching fresh fashion & trends...');
             
@@ -431,9 +437,11 @@ class NewsAPI {
         try {
             this.loadCache();
             
-            if (!this.needsUpdate() && this.cache.data.nyEvents) {
-                return this.cache.data.nyEvents;
-            }
+            // Temporarily bypass cache for testing
+            console.log('Bypassing cache for Events - fetching fresh data');
+            // if (!this.needsUpdate() && this.cache.data.nyEvents) {
+            //     return this.cache.data.nyEvents;
+            // }
             
             console.log('Fetching fresh NY events...');
             

@@ -199,9 +199,17 @@ function updateTopStories(articles) {
                 const excerpt = storyItems[index].querySelector('.story-excerpt');
                 const time = storyItems[index].querySelector('.story-time');
                 
-                if (title) title.textContent = article.headline;
+                if (title) {
+                    title.textContent = article.headline;
+                    title.style.cursor = 'pointer';
+                    title.onclick = () => window.open(article.url, '_blank', 'noopener,noreferrer');
+                }
                 if (excerpt) excerpt.textContent = article.summary;
                 if (time) time.textContent = article.time;
+                
+                // Make entire story item clickable
+                storyItems[index].style.cursor = 'pointer';
+                storyItems[index].onclick = () => window.open(article.url, '_blank', 'noopener,noreferrer');
             }
         });
     } else {
@@ -235,27 +243,55 @@ function updateTopStories(articles) {
 function updateNYNews(articles) {
     const newsCards = document.querySelectorAll('#ny-news .news-card');
     
-    articles.slice(0, 3).forEach((article, index) => {
-        if (newsCards[index]) {
-            const image = newsCards[index].querySelector('.news-image img');
-            const headline = newsCards[index].querySelector('.news-headline');
-            const summary = newsCards[index].querySelector('.news-summary');
-            const source = newsCards[index].querySelector('.news-source');
-            const time = newsCards[index].querySelector('.news-time');
-            const readMore = newsCards[index].querySelector('.read-more');
-            
-            if (image) image.src = article.image || 'https://via.placeholder.com/300x200/2c2c2c/ffffff?text=NYC+News';
-            if (headline) headline.textContent = article.headline;
-            if (summary) summary.textContent = article.summary;
-            if (source) source.textContent = article.source;
-            if (time) time.textContent = article.time;
-            if (readMore) {
-                readMore.href = article.url;
-                readMore.target = '_blank';
-                readMore.rel = 'noopener noreferrer';
+    if (articles && articles.length > 0) {
+        articles.slice(0, 3).forEach((article, index) => {
+            if (newsCards[index]) {
+                const image = newsCards[index].querySelector('.news-image img');
+                const headline = newsCards[index].querySelector('.news-headline');
+                const summary = newsCards[index].querySelector('.news-summary');
+                const source = newsCards[index].querySelector('.news-source');
+                const time = newsCards[index].querySelector('.news-time');
+                const readMore = newsCards[index].querySelector('.read-more');
+                
+                if (image) image.src = article.image || 'https://via.placeholder.com/300x200/2c2c2c/ffffff?text=No+Image';
+                if (headline) {
+                    headline.textContent = article.headline;
+                    headline.style.cursor = 'pointer';
+                    headline.onclick = () => window.open(article.url, '_blank', 'noopener,noreferrer');
+                }
+                if (summary) summary.textContent = article.summary;
+                if (source) source.textContent = article.source;
+                if (time) time.textContent = article.time;
+                if (readMore) {
+                    readMore.href = article.url;
+                    readMore.target = '_blank';
+                    readMore.rel = 'noopener noreferrer';
+                }
+                
+                // Make entire card clickable
+                newsCards[index].style.cursor = 'pointer';
+                newsCards[index].onclick = () => window.open(article.url, '_blank', 'noopener,noreferrer');
             }
-        }
-    });
+        });
+    } else {
+        // Show "No articles found" for all cards
+        newsCards.forEach(card => {
+            const headline = card.querySelector('.news-headline');
+            const summary = card.querySelector('.news-summary');
+            const source = card.querySelector('.news-source');
+            const time = card.querySelector('.news-time');
+            const readMore = card.querySelector('.read-more');
+            
+            if (headline) headline.textContent = 'No articles found';
+            if (summary) summary.textContent = 'Unable to load NY news at this time.';
+            if (source) source.textContent = '';
+            if (time) time.textContent = '';
+            if (readMore) {
+                readMore.href = '#';
+                readMore.textContent = 'Try again later';
+            }
+        });
+    }
 }
 
 // Update US news section
@@ -294,6 +330,31 @@ function updateUSNews(articles) {
                 if (time) time.textContent = article.time;
             }
         });
+    } else {
+        // Show "No articles found" for main story
+        if (mainStory) {
+            const headline = mainStory.querySelector('.story-headline');
+            const summary = mainStory.querySelector('.story-summary');
+            const readMore = mainStory.querySelector('.read-more');
+            
+            if (headline) headline.textContent = 'No articles found';
+            if (summary) summary.textContent = 'Unable to load national news at this time.';
+            if (readMore) {
+                readMore.href = '#';
+                readMore.textContent = 'Try again later';
+            }
+        }
+        
+        // Clear sidebar stories
+        sidebarStories.forEach(story => {
+            const title = story.querySelector('.story-title');
+            const excerpt = story.querySelector('.story-excerpt');
+            const time = story.querySelector('.story-time');
+            
+            if (title) title.textContent = 'No articles available';
+            if (excerpt) excerpt.textContent = '';
+            if (time) time.textContent = '';
+        });
     }
 }
 
@@ -301,25 +362,43 @@ function updateUSNews(articles) {
 function updateGlobalNews(articles) {
     const globalCards = document.querySelectorAll('#global-news .global-card');
     
-    articles.slice(0, 4).forEach((article, index) => {
-        if (globalCards[index]) {
-            const region = globalCards[index].querySelector('.region');
-            const headline = globalCards[index].querySelector('.card-headline');
-            const summary = globalCards[index].querySelector('.card-summary');
-            const time = globalCards[index].querySelector('.time');
-            const readMore = globalCards[index].querySelector('.read-more');
-            
-            if (region) region.textContent = article.region;
-            if (headline) headline.textContent = article.headline;
-            if (summary) summary.textContent = article.summary;
-            if (time) time.textContent = article.time;
-            if (readMore) {
-                readMore.href = article.url;
-                readMore.target = '_blank';
-                readMore.rel = 'noopener noreferrer';
+    if (articles && articles.length > 0) {
+        articles.slice(0, 4).forEach((article, index) => {
+            if (globalCards[index]) {
+                const region = globalCards[index].querySelector('.region');
+                const headline = globalCards[index].querySelector('.card-headline');
+                const summary = globalCards[index].querySelector('.card-summary');
+                const time = globalCards[index].querySelector('.time');
+                const readMore = globalCards[index].querySelector('.read-more');
+                
+                if (region) region.textContent = article.region || 'Global';
+                if (headline) headline.textContent = article.headline;
+                if (summary) summary.textContent = article.summary;
+                if (time) time.textContent = article.time;
+                if (readMore) {
+                    readMore.href = article.url;
+                    readMore.target = '_blank';
+                    readMore.rel = 'noopener noreferrer';
+                }
             }
-        }
-    });
+        });
+    } else {
+        // Show "No articles found" for all cards
+        globalCards.forEach(card => {
+            const headline = card.querySelector('.card-headline');
+            const summary = card.querySelector('.card-summary');
+            const time = card.querySelector('.time');
+            const readMore = card.querySelector('.read-more');
+            
+            if (headline) headline.textContent = 'No articles found';
+            if (summary) summary.textContent = 'Unable to load global news at this time.';
+            if (time) time.textContent = '';
+            if (readMore) {
+                readMore.href = '#';
+                readMore.textContent = 'Try again later';
+            }
+        });
+    }
 }
 
 // Update opinion section
@@ -362,6 +441,35 @@ function updateOpinion(articles) {
                 if (time) time.textContent = article.time;
             }
         });
+    } else {
+        // Show "No articles found" for featured opinion
+        if (opinionFeatured) {
+            const headline = opinionFeatured.querySelector('.opinion-headline');
+            const summary = opinionFeatured.querySelector('.opinion-summary');
+            const author = opinionFeatured.querySelector('.opinion-author');
+            const readMore = opinionFeatured.querySelector('.read-more');
+            
+            if (headline) headline.textContent = 'No articles found';
+            if (summary) summary.textContent = 'Unable to load opinion pieces at this time.';
+            if (author) author.textContent = '';
+            if (readMore) {
+                readMore.href = '#';
+                readMore.textContent = 'Try again later';
+            }
+        }
+        
+        // Clear opinion list
+        opinionList.forEach(item => {
+            const title = item.querySelector('.opinion-title');
+            const author = item.querySelector('.opinion-author');
+            const excerpt = item.querySelector('.opinion-excerpt');
+            const time = item.querySelector('.opinion-time');
+            
+            if (title) title.textContent = 'No articles available';
+            if (author) author.textContent = '';
+            if (excerpt) excerpt.textContent = '';
+            if (time) time.textContent = '';
+        });
     }
 }
 
@@ -403,6 +511,33 @@ function updateArtsCulture(articles) {
                 if (time) time.textContent = article.time;
             }
         });
+    } else {
+        // Show "No articles found" for featured arts
+        if (artsFeatured) {
+            const headline = artsFeatured.querySelector('.arts-headline');
+            const summary = artsFeatured.querySelector('.arts-summary');
+            const category = artsFeatured.querySelector('.arts-category');
+            const readMore = artsFeatured.querySelector('.read-more');
+            
+            if (headline) headline.textContent = 'No articles found';
+            if (summary) summary.textContent = 'Unable to load arts & culture news at this time.';
+            if (category) category.textContent = '';
+            if (readMore) {
+                readMore.href = '#';
+                readMore.textContent = 'Try again later';
+            }
+        }
+        
+        // Clear arts list
+        artsList.forEach(item => {
+            const title = item.querySelector('.arts-title');
+            const excerpt = item.querySelector('.arts-excerpt');
+            const time = item.querySelector('.arts-time');
+            
+            if (title) title.textContent = 'No articles available';
+            if (excerpt) excerpt.textContent = '';
+            if (time) time.textContent = '';
+        });
     }
 }
 
@@ -410,27 +545,47 @@ function updateArtsCulture(articles) {
 function updateFashionTrends(articles) {
     const fashionCards = document.querySelectorAll('#fashion .fashion-card');
     
-    articles.slice(0, 3).forEach((article, index) => {
-        if (fashionCards[index]) {
-            const image = fashionCards[index].querySelector('.fashion-image img');
-            const headline = fashionCards[index].querySelector('.fashion-headline');
-            const summary = fashionCards[index].querySelector('.fashion-summary');
-            const category = fashionCards[index].querySelector('.fashion-category');
-            const time = fashionCards[index].querySelector('.fashion-time');
-            const readMore = fashionCards[index].querySelector('.read-more');
-            
-            if (image) image.src = article.image || 'https://via.placeholder.com/300x400/2c2c2c/ffffff?text=Fashion';
-            if (headline) headline.textContent = article.headline;
-            if (summary) summary.textContent = article.summary;
-            if (category) category.textContent = article.category;
-            if (time) time.textContent = article.time;
-            if (readMore) {
-                readMore.href = article.url;
-                readMore.target = '_blank';
-                readMore.rel = 'noopener noreferrer';
+    if (articles && articles.length > 0) {
+        articles.slice(0, 3).forEach((article, index) => {
+            if (fashionCards[index]) {
+                const image = fashionCards[index].querySelector('.fashion-image img');
+                const headline = fashionCards[index].querySelector('.fashion-headline');
+                const summary = fashionCards[index].querySelector('.fashion-summary');
+                const category = fashionCards[index].querySelector('.fashion-category');
+                const time = fashionCards[index].querySelector('.fashion-time');
+                const readMore = fashionCards[index].querySelector('.read-more');
+                
+                if (image) image.src = article.image || 'https://via.placeholder.com/300x400/2c2c2c/ffffff?text=No+Image';
+                if (headline) headline.textContent = article.headline;
+                if (summary) summary.textContent = article.summary;
+                if (category) category.textContent = article.category;
+                if (time) time.textContent = article.time;
+                if (readMore) {
+                    readMore.href = article.url;
+                    readMore.target = '_blank';
+                    readMore.rel = 'noopener noreferrer';
+                }
             }
-        }
-    });
+        });
+    } else {
+        // Show "No articles found" for all cards
+        fashionCards.forEach(card => {
+            const headline = card.querySelector('.fashion-headline');
+            const summary = card.querySelector('.fashion-summary');
+            const category = card.querySelector('.fashion-category');
+            const time = card.querySelector('.fashion-time');
+            const readMore = card.querySelector('.read-more');
+            
+            if (headline) headline.textContent = 'No articles found';
+            if (summary) summary.textContent = 'Unable to load fashion & trends at this time.';
+            if (category) category.textContent = '';
+            if (time) time.textContent = '';
+            if (readMore) {
+                readMore.href = '#';
+                readMore.textContent = 'Try again later';
+            }
+        });
+    }
 }
 
 // Update NY events section
@@ -476,6 +631,39 @@ function updateNYEvents(articles) {
                 if (location) location.textContent = article.location;
                 if (time) time.textContent = article.time;
             }
+        });
+    } else {
+        // Show "No articles found" for featured event
+        if (eventsFeatured) {
+            const headline = eventsFeatured.querySelector('.event-headline');
+            const summary = eventsFeatured.querySelector('.event-summary');
+            const date = eventsFeatured.querySelector('.event-date');
+            const location = eventsFeatured.querySelector('.event-location');
+            const readMore = eventsFeatured.querySelector('.read-more');
+            
+            if (headline) headline.textContent = 'No articles found';
+            if (summary) summary.textContent = 'Unable to load NY events at this time.';
+            if (date) date.textContent = '';
+            if (location) location.textContent = '';
+            if (readMore) {
+                readMore.href = '#';
+                readMore.textContent = 'Try again later';
+            }
+        }
+        
+        // Clear events list
+        eventsList.forEach(item => {
+            const title = item.querySelector('.event-title');
+            const location = item.querySelector('.event-location');
+            const time = item.querySelector('.event-time');
+            const day = item.querySelector('.day');
+            const month = item.querySelector('.month');
+            
+            if (title) title.textContent = 'No events available';
+            if (location) location.textContent = '';
+            if (time) time.textContent = '';
+            if (day) day.textContent = '';
+            if (month) month.textContent = '';
         });
     }
 }

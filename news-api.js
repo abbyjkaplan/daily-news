@@ -300,8 +300,8 @@ class NewsAPI {
             console.log('Fetching fresh opinion articles...');
             
             const sources = [
-                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'opinion' }),
-                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'opinion' })
+                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'opinion OR editorial OR commentary' }),
+                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'opinion OR editorial OR commentary' })
             ];
             
             const results = await Promise.allSettled(sources.map(source => source()));
@@ -330,7 +330,7 @@ class NewsAPI {
             
         } catch (error) {
             console.error('Error fetching opinion articles:', error);
-            return this.cache.data.opinion || this.getMockOpinion();
+            return this.cache.data.opinion || [];
         }
     }
 
@@ -346,8 +346,8 @@ class NewsAPI {
             console.log('Fetching fresh arts & culture...');
             
             const sources = [
-                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'arts culture' }),
-                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'arts culture' })
+                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'arts OR culture OR entertainment OR music OR theater' }),
+                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'arts OR culture OR entertainment OR music OR theater' })
             ];
             
             const results = await Promise.allSettled(sources.map(source => source()));
@@ -376,7 +376,7 @@ class NewsAPI {
             
         } catch (error) {
             console.error('Error fetching arts & culture:', error);
-            return this.cache.data.artsCulture || this.getMockArtsCulture();
+            return this.cache.data.artsCulture || [];
         }
     }
 
@@ -392,8 +392,8 @@ class NewsAPI {
             console.log('Fetching fresh fashion & trends...');
             
             const sources = [
-                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'fashion trends' }),
-                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'fashion trends' })
+                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'fashion OR style OR trends OR beauty' }),
+                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'fashion OR style OR trends OR beauty' })
             ];
             
             const results = await Promise.allSettled(sources.map(source => source()));
@@ -422,7 +422,7 @@ class NewsAPI {
             
         } catch (error) {
             console.error('Error fetching fashion & trends:', error);
-            return this.cache.data.fashionTrends || this.getMockFashionTrends();
+            return this.cache.data.fashionTrends || [];
         }
     }
 
@@ -438,8 +438,8 @@ class NewsAPI {
             console.log('Fetching fresh NY events...');
             
             const sources = [
-                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'New York events' }),
-                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'New York events' })
+                () => this.fetchFromGuardian('/search', { 'show-fields': 'headline,trailText,thumbnail', q: 'New York events OR NYC events OR Manhattan events' }),
+                () => this.fetchFromNYTimes('/search/v2/articlesearch.json', { q: 'New York events OR NYC events OR Manhattan events' })
             ];
             
             const results = await Promise.allSettled(sources.map(source => source()));
@@ -468,7 +468,7 @@ class NewsAPI {
             
         } catch (error) {
             console.error('Error fetching NY events:', error);
-            return this.cache.data.nyEvents || this.getMockNYEvents();
+            return this.cache.data.nyEvents || [];
         }
     }
 

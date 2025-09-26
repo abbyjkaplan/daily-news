@@ -310,13 +310,18 @@ class NewsAPI {
             const articles = [];
             
             results.forEach((result, index) => {
+                console.log(`Processing result ${index}:`, result.status, result.value ? 'has data' : 'no data');
                 if (result.status === 'fulfilled' && result.value) {
                     try {
+                        console.log(`Calling processArticles for source ${index}`);
                         const processed = this.processArticles(result.value, index);
+                        console.log(`Processed ${processed.length} articles from source ${index}`);
                         articles.push(...processed);
                     } catch (error) {
                         console.warn(`Error processing opinion from source ${index}:`, error);
                     }
+                } else {
+                    console.warn(`Source ${index} failed or returned no data:`, result.reason || 'No data');
                 }
             });
             
@@ -568,6 +573,7 @@ class NewsAPI {
     processArticles(data, sourceIndex) {
         const articles = [];
         console.log(`Processing articles from source ${sourceIndex}:`, data);
+        console.log(`Data type: ${typeof data}, Data keys:`, data ? Object.keys(data) : 'null');
         
         switch (sourceIndex) {
             case 0: // NewsAPI

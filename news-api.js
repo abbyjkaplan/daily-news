@@ -643,7 +643,13 @@ class NewsAPI {
     // Rank articles by relevance and recency
     rankArticles(articles) {
         console.log(`Ranking ${articles.length} articles`);
-        const filtered = articles.filter(article => article.headline && article.url);
+        console.log('Sample article:', articles[0]);
+        const filtered = articles.filter(article => {
+            const hasHeadline = !!article.headline;
+            const hasUrl = !!article.url;
+            console.log(`Article check - headline: ${hasHeadline}, url: ${hasUrl}, headline: "${article.headline}", url: "${article.url}"`);
+            return hasHeadline && hasUrl;
+        });
         console.log(`After filtering: ${filtered.length} articles`);
         return filtered.sort((a, b) => {
                 let scoreA = 0;

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test - Daily News Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 CORS Test - Daily News Platform</h1>
+    
+    <div class="test-section">
+        <h2>🧪 Test Direct API Calls</h2>
+        <button onclick="testDirectCalls()">Test Direct API Calls</button>
+        <button onclick="testCORS()">Test CORS Issues</button>
+        <button onclick="testWithProxy()">Test With CORS Proxy</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="test-results" class="test-results">
+            <div class="status info">Click the test buttons above to check for CORS issues...</div>
+        </div>
+    </div>
+
+    <script>
+        async function testDirectCalls() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing direct API calls...</div>';
+            
+            let html = '<h3>Direct API Call Tests:</h3>';
+            
+            // Test Guardian API directly
+            try {
+                const guardianUrl = 'https://content.guardianapis.com/search?api-key=4ee83d60-f3c2-432f-bccd-edda4bad2bbe&show-fields=headline,trailText,thumbnail&q=opinion';
+                html += '<h4>Guardian API Direct Call:</h4>';
+                html += `<div class="status info">URL: ${guardianUrl}</div>`;
+                
+                const guardianResponse = await fetch(guardianUrl);
+                if (guardianResponse.ok) {
+                    const guardianData = await guardianResponse.json();
+                    html += `<div class="status success">✓ Guardian API: ${guardianData.response?.results?.length || 0} results</div>`;
+                } else {
+                    html += `<div class="status error">✗ Guardian API Error: ${guardianResponse.status}</div>`;
+                }
+            } catch (error) {
+                html += `<div class="status error">✗ Guardian API CORS Error: ${error.message}</div>`;
+            }
+            
+            // Test NY Times API directly
+            try {
+                const nytUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=ryJNFYRNEe5nntlRnMCNJLnC1CQE6Juh&q=opinion';
+                html += '<h4>NY Times API Direct Call:</h4>';
+                html += `<div class="status info">URL: ${nytUrl}</div>`;
+                
+                const nytResponse = await fetch(nytUrl);
+                if (nytResponse.ok) {
+                    const nytData = await nytResponse.json();
+                    html += `<div class="status success">✓ NY Times API: ${nytData.response?.docs?.length || 0} results</div>`;
+                } else {
+                    html += `<div class="status error">✗ NY Times API Error: ${nytResponse.status}</div>`;
+                }
+            } catch (error) {
+                html += `<div class="status error">✗ NY Times API CORS Error: ${error.message}</div>`;
+            }
+            
+            // Test NewsAPI directly
+            try {
+                const newsapiUrl = 'https://newsapi.org/v2/everything?apiKey=6ce6ad8f6dc149748aa5d88eaa26632e&q=opinion&sortBy=publishedAt&pageSize=10';
+                html += '<h4>NewsAPI Direct Call:</h4>';
+                html += `<div class="status info">URL: ${newsapiUrl}</div>`;
+                
+                const newsapiResponse = await fetch(newsapiUrl);
+                if (newsapiResponse.ok) {
+                    const newsapiData = await newsapiResponse.json();
+                    html += `<div class="status success">✓ NewsAPI: ${newsapiData.articles?.length || 0} results</div>`;
+                } else {
+                    html += `<div class="status error">✗ NewsAPI Error: ${newsapiResponse.status}</div>`;
+                }
+            } catch (error) {
+                html += `<div class="status error">✗ NewsAPI CORS Error: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        async function testCORS() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing CORS issues...</div>';
+            
+            let html = '<h3>CORS Test Results:</h3>';
+            
+            // Test if we can make simple requests
+            try {
+                const testUrl = 'https://httpbin.org/get';
+                const response = await fetch(testUrl);
+                if (response.ok) {
+                    html += '<div class="status success">✓ Basic CORS test passed</div>';
+                } else {
+                    html += '<div class="status error">✗ Basic CORS test failed</div>';
+                }
+            } catch (error) {
+                html += `<div class="status error">✗ CORS Error: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        async function testWithProxy() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">Testing with CORS proxy...</div>';
+            
+            let html = '<h3>CORS Proxy Test:</h3>';
+            html += '<div class="status info">Note: This would require a CORS proxy service</div>';
+            html += '<div class="status warning">⚠ CORS proxy not implemented - this is just a placeholder</div>';
+            
+            results.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

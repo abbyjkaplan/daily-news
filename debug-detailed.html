@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detailed Debug - Daily News Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .test-results {
+            margin-top: 20px;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .api-test {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Detailed Debug - Daily News Platform</h1>
+    
+    <div class="debug-section">
+        <h2>🧪 API Configuration Test</h2>
+        <button onclick="testAPIConfig()">Test API Configuration</button>
+        <button onclick="testIndividualAPIs()">Test Individual APIs</button>
+        <button onclick="testDirectAPICalls()">Test Direct API Calls</button>
+        <button onclick="clearCacheAndTest()">Clear Cache & Test</button>
+    </div>
+
+    <div class="debug-section">
+        <h2>📊 Debug Results</h2>
+        <div id="debug-results" class="test-results">
+            <div class="status info">Click the test buttons above to run detailed diagnostics...</div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="news-api.js"></script>
+    <script>
+        let newsAPI;
+        
+        // Initialize NewsAPI
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                newsAPI = new NewsAPI();
+                console.log('NewsAPI initialized successfully');
+                console.log('API Keys:', {
+                    newsapi: newsAPI.apiKeys.newsapi ? 'Set' : 'Not set',
+                    guardian: newsAPI.apiKeys.guardian ? 'Set' : 'Not set',
+                    nytimes: newsAPI.apiKeys.nytimes ? 'Set' : 'Not set'
+                });
+            } catch (error) {
+                console.error('Error initializing NewsAPI:', error);
+            }
+        });
+
+        async function testAPIConfig() {
+            const results = document.getElementById('debug-results');
+            results.innerHTML = '<div class="status info">Testing API configuration...</div>';
+            
+            if (!newsAPI) {
+                results.innerHTML = '<div class="status error">✗ NewsAPI not initialized</div>';
+                return;
+            }
+            
+            let html = '<div class="status info">API Configuration:</div><ul>';
+            
+            // Test API keys
+            const keys = {
+                'NewsAPI': newsAPI.apiKeys.newsapi,
+                'Guardian': newsAPI.apiKeys.guardian,
+                'NY Times': newsAPI.apiKeys.nytimes
+            };
+            
+            for (const [name, key] of Object.entries(keys)) {
+                const status = key && key !== 'your-api-key-here' ? 'success' : 'error';
+                const value = key && key !== 'your-api-key-here' ? 'Set' : 'Not set';
+                html += `<li class="status ${status}">${name}: ${value}</li>`;
+            }
+            
+            html += '</ul>';
+            results.innerHTML = html;
+        }
+
+        async function testIndividualAPIs() {
+            const results = document.getElementById('debug-results');
+            results.innerHTML = '<div class="status info">Testing individual APIs...</div>';
+            
+            try {
+                const sections = [
+                    { name: 'Opinion', method: 'fetchOpinion' },
+                    { name: 'Arts & Culture', method: 'fetchArtsCulture' },
+                    { name: 'Fashion & Trends', method: 'fetchFashionTrends' },
+                    { name: 'NY Events', method: 'fetchNYEvents' }
+                ];
+                
+                let html = '<div class="status info">Individual API Tests:</div>';
+                
+                for (const section of sections) {
+                    html += `<div class="api-test"><strong>${section.name}:</strong> `;
+                    try {
+                        const startTime = Date.now();
+                        const articles = await newsAPI[section.method]();
+                        const endTime = Date.now();
+                        const duration = endTime - startTime;
+                        
+                        if (articles && articles.length > 0) {
+                            html += `<span class="status success">✓ ${articles.length} articles (${duration}ms)</span>`;
+                            console.log(`${section.name} articles:`, articles);
+                        } else {
+                            html += `<span class="status warning">⚠ No articles returned (${duration}ms)</span>`;
+                        }
+                    } catch (error) {
+                        html += `<span class="status error">✗ Error: ${error.message}</span>`;
+                        console.error(`${section.name} error:`, error);
+                    }
+                    html += '</div>';
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="status error">✗ Error testing APIs: ${error.message}</div>`;
+            }
+        }
+
+        async function testDirectAPICalls() {
+            const results = document.getElementById('debug-results');
+            results.innerHTML = '<div class="status info">Testing direct API calls...</div>';
+            
+            try {
+                let html = '<div class="status info">Direct API Call Tests:</div>';
+                
+                // Test Guardian API
+                try {
+                    const guardianResult = await newsAPI.fetchFromGuardian('/search', { 
+                        'show-fields': 'headline,trailText,thumbnail', 
+                        q: 'opinion OR editorial OR commentary' 
+                    });
+                    html += `<div class="api-test"><strong>Guardian API:</strong> `;
+                    if (guardianResult && guardianResult.response && guardianResult.response.results) {
+                        html += `<span class="status success">✓ ${guardianResult.response.results.length} results</span>`;
+                    } else {
+                        html += `<span class="status warning">⚠ No results or unexpected format</span>`;
+                    }
+                    html += '</div>';
+                    console.log('Guardian result:', guardianResult);
+                } catch (error) {
+                    html += `<div class="api-test"><strong>Guardian API:</strong> <span class="status error">✗ Error: ${error.message}</span></div>`;
+                }
+                
+                // Test NY Times API
+                try {
+                    const nytResult = await newsAPI.fetchFromNYTimes('/search/v2/articlesearch.json', { 
+                        q: 'opinion OR editorial OR commentary' 
+                    });
+                    html += `<div class="api-test"><strong>NY Times API:</strong> `;
+                    if (nytResult && nytResult.response && nytResult.response.docs) {
+                        html += `<span class="status success">✓ ${nytResult.response.docs.length} results</span>`;
+                    } else {
+                        html += `<span class="status warning">⚠ No results or unexpected format</span>`;
+                    }
+                    html += '</div>';
+                    console.log('NY Times result:', nytResult);
+                } catch (error) {
+                    html += `<div class="api-test"><strong>NY Times API:</strong> <span class="status error">✗ Error: ${error.message}</span></div>`;
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="status error">✗ Error testing direct API calls: ${error.message}</div>`;
+            }
+        }
+
+        async function clearCacheAndTest() {
+            const results = document.getElementById('debug-results');
+            results.innerHTML = '<div class="status info">Clearing cache and testing...</div>';
+            
+            try {
+                if (newsAPI && newsAPI.clearCache) {
+                    newsAPI.clearCache();
+                    results.innerHTML = '<div class="status success">✓ Cache cleared</div>';
+                    setTimeout(() => {
+                        testIndividualAPIs();
+                    }, 1000);
+                } else {
+                    results.innerHTML = '<div class="status error">✗ NewsAPI not available</div>';
+                }
+            } catch (error) {
+                results.innerHTML = `<div class="status error">✗ Error clearing cache: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

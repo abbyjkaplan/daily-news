@@ -608,7 +608,9 @@ class NewsAPI {
                 break;
                 
             case 1: // Guardian
+                console.log('Guardian data check:', data.response && data.response.results);
                 if (data.response && data.response.results) {
+                    console.log(`Found ${data.response.results.length} Guardian articles`);
                     data.response.results.forEach(article => {
                         articles.push({
                             headline: article.webTitle,
@@ -621,11 +623,15 @@ class NewsAPI {
                             sourceType: 'guardian'
                         });
                     });
+                } else {
+                    console.log('Guardian data structure issue:', data);
                 }
                 break;
                 
             case 2: // NY Times
+                console.log('NY Times data check:', data.response && data.response.docs);
                 if (data.response && data.response.docs) {
+                    console.log(`Found ${data.response.docs.length} NY Times articles`);
                     data.response.docs.forEach(article => {
                         articles.push({
                             headline: article.headline?.main || article.title,
@@ -640,6 +646,7 @@ class NewsAPI {
                     });
                 } else if (data.results) {
                     // Fallback for other NY Times API formats
+                    console.log(`Found ${data.results.length} NY Times articles (fallback format)`);
                     data.results.forEach(article => {
                         articles.push({
                             headline: article.title,
@@ -652,6 +659,8 @@ class NewsAPI {
                             sourceType: 'nytimes'
                         });
                     });
+                } else {
+                    console.log('NY Times data structure issue:', data);
                 }
                 break;
         }
